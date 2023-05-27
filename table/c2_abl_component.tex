@@ -1,0 +1,75 @@
+\begin{table}[t]
+\caption{在MSRVTT-QA和KnowIT-VQA数据集上关于LiVLR核心成分的消融实验
+% $\ev_{no}$（$\ev_{da}$）表示DaVL在表征整合时不使用（使用）多样性感知嵌入。
+}
+\label{tab:c2_abl_comps} 
+\setlength{\tabcolsep}{2.43mm}{
+\begin{tabularx}{\textwidth}{llccccccccc}
+\toprule
+\multicolumn{2}{c}{\multirow{2}{*}{S/N}} 
+&\multicolumn{2}{c}{Visual Encoder}
+&\multicolumn{2}{c}{Linguistic Encoder} 
+&\multicolumn{2}{c}{DaVL} 
+&\multirow{2}{*}{MSRVTT-QA~\cite{xu2017video}} 
+&\multirow{2}{*}{KnowIT-VQA~\cite{garcia2020knowit}} 
+\\
+\cmidrule(lr){3-4} 
+\cmidrule(lr){5-6} 
+\cmidrule(lr){7-8} 
+
+\multicolumn{2}{c}{~} 
+&$\Xmat_{V, g}$ &$\Xmat_{V, l}$
+&$\Xmat_{L, g}$ &$\Xmat_{L, l}$
+&$\ev_{no}$ &$\ev_{da}$ 
+& & 
+\\ 
+\midrule
+
+\multicolumn{2}{c}{Ques-only}
+&\multicolumn{6}{c}{------} &31.20\% &50.12\% 
+\\
+\midrule
+
+\multirow{4}{*}{I}
+&\#1 &\checkmark &\checkmark & & 
+&\checkmark & &38.99\% &67.77\% 
+\\ 
+&\#2 &\checkmark &\checkmark & & 
+& &\checkmark &40.63\% &70.21\% 
+\\
+
+&\#3 & & &\checkmark &\checkmark 
+&\checkmark & &49.45\% &68.00\% 
+\\ 
+&\#4 & & &\checkmark &\checkmark 
+& &\checkmark &51.26\% &68.73\% 
+\\
+\midrule
+
+\multirow{4}{*}{II}
+&\#5 &\checkmark & &\checkmark & 
+&\checkmark & &48.12\% &67.19\% 
+\\ 
+&\#6 &\checkmark & &\checkmark & 
+& &\checkmark &49.58\% &70.00\% 
+\\
+
+&\#7 & &\checkmark & &\checkmark 
+&\checkmark & &50.03\% &67.87\% 
+\\ 
+&\#8 & &\checkmark & &\checkmark 
+& &\checkmark &51.85\% &71.98\% 
+\\
+\midrule
+
+\multirow{2}{*}{III}
+&\#9 &\checkmark &\checkmark &\checkmark &\checkmark 
+&\checkmark & &56.16\% &73.79\% 
+\\ 
+&\#10 &\checkmark &\checkmark &\checkmark &\checkmark 
+& &\checkmark &\textbf{59.44\%} &\textbf{77.10\%} 
+\\
+\bottomrule
+\end{tabularx}
+} % tab col sep
+\end{table}

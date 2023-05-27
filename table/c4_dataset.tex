@@ -1,0 +1,83 @@
+\begin{table}[!t]
+\caption{
+数据集的统计信息 
+% Metric表示数据集提供的输入鲁棒性的评价指标，QType表示问题的类型，len(Q)表示问题的平均长度。
+% \#IQ、\#Pert/CE 和 \#Ori/Easy分别表示图像-问题对的总数、添加了输入变化后样本的数量和原始样本数量。
+}
+\label{tab:c4_benchmark}
+\setlength{\tabcolsep}{1.18mm}{
+\begin{tabularx}{\textwidth}{@{}lccccccccc}
+\toprule
+
+\multirow{2}{*}{Dataset} 
+&\multirow{2}{*}{Perturbation} 
+&\multirow{2}{*}{Metric}
+&\multirow{2}{*}{QType} 
+&Training%\multicolumn{1}{c}{\multirow{2}{*}{\makecell{Training\\Dataset}}}
+&\multicolumn{4}{c}{Evaluation} 
+\\ 
+\cmidrule(l){6-9}
+& & &
+&Dataset
+&len(Q) &\#IQ &\#PER/CE &\#ORI/Easy 
+\\ 
+\midrule
+% 换个说法说 
+VQA-Rep~\cite{shah2019cycle} 
+&Rephrasing 
+&CS($m$) 
+&All 
+&VQA v2 train
+&7.15 
+&\eqmakebox[log][r]{162k} 
+&\eqmakebox[log][r]{121,516} 
+&\eqmakebox[log][r]{40,504} 
+\\ 
+% 改写 
+VQA P2~\cite{whitehead2020learning} 
+&Par\&Syn\&Ant 
+&CS($m$) 
+&All 
+&VQA v2 train
+&6.32 
+&\eqmakebox[log][r]{52k} 
+&\eqmakebox[log][r]{26,512} 
+&\eqmakebox[log][r]{25,814}
+\\ 
+
+IV-VQA~\cite{agarwal2020towards} 
+&Invariant object 
+&\#flips 
+&All 
+&VQA v2 train
+&5.85 
+&\eqmakebox[log][r]{120k} 
+&\eqmakebox[log][r]{83,700} 
+&\eqmakebox[log][r]{36,181} 
+\\ 
+
+CV-VQA~\cite{agarwal2020towards} 
+&Covariant object 
+&\#flips 
+&Num  
+&VQA v2 train
+&5.83 
+&\eqmakebox[log][r]{4k} 
+&\eqmakebox[log][r]{4,141} 
+&\eqmakebox[log][r]{2,641}
+\\ 
+
+VQA-CE~\cite{dancette2021beyond} 
+&Counterexample 
+&- 
+&All 
+&VQA v2 train
+&6.19 
+&\eqmakebox[log][r]{214k} 
+&\eqmakebox[log][r]{63,298} 
+&\eqmakebox[log][r]{147,681}
+\\ 
+\bottomrule
+\end{tabularx}
+}
+\end{table}

@@ -1,0 +1,50 @@
+\begin{table}[!t]
+\caption{训练样本数$N_{\mathcal{D}}=64$时不同路由机制的性能比较 
+% MixPHM-Token和MixPHM-Sent表示用 Fedus~等人~\cite{fedus2021switch}提出的分词级别和句子级别的随机路由策略为MixPHM选择激活的专家。 
+% MixPHM-Rep是本章提出的基于表征聚合的路由策略。
+% Time表示训练时每次参数更新的平均用时（单位：秒）。
+}
+\label{tab:c5_abl_routing}
+\setlength{\tabcolsep}{7.65mm}{
+\begin{tabularx}{\linewidth}{@{}lcccc}
+\toprule
+\multirow{1}{*}{Method} 
+&Time (s)
+&\multicolumn{1}{c}{VQA v2 val}
+&\multicolumn{1}{c}{GQA test-dev}
+&\multicolumn{1}{c}{OK-VQA test}
+\\ 
+\midrule
+
+MixPHM-Token
+&0.693
+&47.67$~\std{0.92}$ 
+&36.23$~\std{0.89}$ 
+&17.77$~\std{0.89}$
+\\
+
+MixPHM-Sent
+&0.683
+&47.69$~\std{0.99}$ 
+&36.13$~\std{0.86}$ 
+&17.83$~\std{1.32}$
+\\
+
+MixPHM-Rep
+&0.675
+&48.00$~\std{0.95}$ 
+&\textbf{36.77$~\std{0.55}$} 
+&18.25$~\std{1.46}$
+\\ 
+
+MixPHM
+&0.668
+&\textbf{48.26$~\std{0.56}$}
+&\text{36.75$~\std{0.55}$}
+&\textbf{18.58$~\std{1.42}$}
+\\ 
+
+\bottomrule
+\end{tabularx}
+}
+\end{table}

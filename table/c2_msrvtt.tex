@@ -1,0 +1,136 @@
+\begin{table}[!t]
+\caption{在MSRVTT-QA数据集上的性能比较
+% 。\#Param表示可训练的模型参数的数量，
+% Pretraining提示方法是否采用大规模视频语言预训练。
+}
+\label{tab:c2_MSRVTT} 
+\setlength{\tabcolsep}{2.7mm}{
+\begin{tabularx}{\textwidth}{llccccccccc}
+\toprule
+\multirow{2}{*}{S/N}
+&\multirow{2}{*}{Method} 
+% &\multicolumn{3}{c|}{Video Representation} 
+&\multicolumn{1}{c}{\multirow{2}{*}{\#Param}}
+&\multicolumn{1}{c}{\multirow{2}{*}{Pretraining}}
+&\multicolumn{6}{c}{Accuracy (\%)} 
+\\ 
+
+\cmidrule(l){5-10} 
+& 
+& &
+&What &Who &How &When &Where &All 
+\\ 
+\midrule
+
+\multirow{4}{*}{({I})}
+&SSML~\cite{amrani2021noise} 
+% &ResNeXt-101 &ResNet-152 &\xmark 
+&- &\checkmark
+&- &- &- &- &- &35.1 
+\\ 
+
+&ClipBERT~\cite{lei2021less} 
+% &\xmark &ResNet-50 &\xmark 
+&113.5M &\checkmark 
+&- &- &- &- &- &37.4 
+\\ 
+
+&CoMVT~\cite{seo2021look} 
+% &S3D &\xmark &Faster R-CNN 
+&- &\checkmark 
+&- &- &- &- &- &39.5 
+\\ 
+
+&VQA-T~\cite{yang2021just} 
+% &S3D &\xmark &\xmark 
+&156.5M &\checkmark 
+&- &- &- &- &- &41.5 
+\\ 
+
+\midrule
+
+\multirow{6}{*}{({II})} 
+&ST-VQA~\cite{jang2017tgif} 
+% &C3D &ResNet-152 &\xmark 
+&39.0M &\xmark 
+&24.5 &41.2 &78.0 &76.5 &34.9 &30.9 
+\\
+
+% ST-VQA在MSRVTT数据集上的实验结果来源于[HME]
+&Co-mem~\cite{gao2018motion} 
+% &BN-Inception &ResNet-152 &\xmark 
+&69.5M &\xmark 
+&23.9 &42.5 &74.1 &69.0 &42.9 &32.0 
+\\
+
+&GRA~\cite{xu2017video} 
+% &C3D &VGG16 &\xmark 
+&35.4M &\xmark 
+&26.2 &43.0 &80.2 &72.5 &30.0 &32.5 
+\\
+
+% 通过AMU单元实现 
+&HME~\cite{fan2019heterogeneous} 
+% &C3D &VGG16 &\xmark 
+&48.3M &\xmark 
+&26.5 &43.6 &82.4 &76.0 &28.6 &33.0 
+\\
+
+&MiNOR~\cite{jin2019multi} 
+% &\xmark &VGG16 &Mask R-CNN 
+&- &\xmark 
+&29.5 &45.0 &83.2 &74.7 &42.4 &35.4 
+\\ 
+
+&HCR~\cite{le2020hierarchical} 
+% &ResNeXt-101 &ResNet-101 &\xmark 
+&43.7M &\xmark 
+&- &- &- &- &- &35.6 
+\\ 
+
+\midrule
+
+\multirow{6}{*}{({III})}
+&MASN~\cite{seo2021attend} 
+% &I3D &ResNet-152 &Faster R-CNN 
+&28.2M &\xmark 
+&- &- &- &- &- &35.2 
+\\ 
+
+&HGA~\cite{jiang2020reasoning} 
+% &C3D &VGG16 &\xmark 
+&121.4M &\xmark 
+&29.2 &45.7 &83.5 &75.2 &34.0 &35.5 
+\\
+
+&DualVGR~\cite{wang2021dualvgr} 
+% &ResNeXt-101 &ResNet-101 &\xmark 
+&34.1M &\xmark 
+&29.4 &45.6 &79.8 &76.7 &36.4 &35.5 
+\\ 
+
+% conditional relation (通过对不同尺度/帧数的feature采样实现relation的表征)
+&Bri2Ans~\cite{park2021bridge} 
+% &ResNeXt-101 &ResNet-101 &\xmark 
+&- &\xmark 
+&- &- &- &- &- &36.9 
+\\ % GNN for both interaction and fusion 
+
+\rowcolor{gray!15}\cellcolor{white}
+&\textbf{LiVLR-V} 
+% &\xmark &ResNet-101 &Faster R-CNN 
+&10.7M &\xmark 
+&34.1 &50.9 &81.5 &\textbf{82.8} &42.2 &40.6 
+\\ 
+% \cline{2-13}
+
+\rowcolor{gray!15}\cellcolor{white} 
+&\multicolumn{1}{l}{\textbf{LiVLR (ALL)}} 
+% &\xmark &ResNet-101 &Faster R-CNN 
+&15.0M &\xmark 
+&\textbf{50.3} &\textbf{77.1} &\textbf{94.2} &81.3 &\textbf{48.4} &\textbf{59.4} 
+\\ 
+\bottomrule
+\end{tabularx}
+}
+\end{table}

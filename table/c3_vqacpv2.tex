@@ -1,0 +1,219 @@
+\begin{table}[!t]
+\caption{在VQA-CP v2数据集上的性能 (\%) 比较
+% 。$^{\dagger}$：该方法使用了额外人工标注的数据；$^{*}$：我们使用开源代码重新实现的结果；--：该方法未评测相关性能。
+}
+\label{tab:c3_vqacpv2}
+\setlength{\tabcolsep}{2.79mm}{
+\begin{tabularx}{\textwidth}{@{}lcccccccc}
+\toprule
+\multirow{2}{*}{Method} 
+&\multicolumn{4}{c}{VQA-CP v2 OOD Test} 
+% \textcolor{blue}{$\uparrow$}
+&\multicolumn{4}{c}{VQA-CP v2 ID Test} 
+% \textcolor{blue}{$\uparrow$}
+\\ 
+
+\cmidrule(lr){2-5}
+\cmidrule(l){6-9}
+&All &Yes/No &Num. &Other 
+&All &Yes/No &Num. &Other 
+\\ 
+\midrule
+
+% *********************************************************************
+\multicolumn{9}{c}{\textbf{KB-based Method}} 
+\\
+RankVQA~\cite{qiao2020rankvqa} 
+&43.05 &42.53 &13.19 &\cellcolor{cyan!10}{51.32} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+% LM~\cite{clark2019don} 
+% &48.78 &72.78 &14.61 &\cellcolor{cyan!10}{45.58} 
+% &-- &-- &-- &\cellcolor{cyan!10}{--} 
+% \\
+
+LMH~\cite{clark2019don} 
+&52.01 &72.58 &31.12 &\cellcolor{cyan!10}{46.97} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+\, + LRS~\cite{guo2021loss} 
+&53.26 &72.82 &48.00 &\cellcolor{cyan!10}{44.46}
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+\, + CCB+VQ-CSS~\cite{yang2021learning} 
+&59.12 &89.12 &51.04 &\cellcolor{cyan!10}{45.62} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+\, + MFE~\cite{gat2020removing} 
+&54.55 &74.03 &49.16 &\cellcolor{cyan!10}{45.82} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+\, + CSS+CL~\cite{liang2020learning} 
+&59.18 &86.99 &49.89 &\cellcolor{cyan!10}{47.16} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+\, + CSS+GS~\cite{liang2020learning}
+&57.37 &79.71 &50.85 &\cellcolor{cyan!10}{47.45} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+\, + CSS~\cite{chen2020counterfactual} 
+&58.95 &84.37 &49.42 &\cellcolor{cyan!10}{48.21} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\ 
+\, + CCB~\cite{yang2021learning} 
+&57.99 &86.41 &45.63 &\cellcolor{cyan!10}{48.76} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+\midrule[0.5pt]
+\midrule[0.5pt]
+% *********************************************************************
+\multicolumn{9}{c}{\textbf{UB-based Method}} 
+\\
+GVQA~\cite{agrawal2018don} 
+&31.30 &57.99 &13.68 &\cellcolor{cyan!10}{22.14}
+&-- &-- &-- &\cellcolor{cyan!10}{}{--} 
+\\
+Actively Seeking~\cite{teney2019actively} 
+&46.00 &58.24 &29.49 &\cellcolor{cyan!10}{44.33} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+VGQE~\cite{kv2020reducing} 
+&50.11 &66.35 &27.08 &\cellcolor{cyan!10}{46.77} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+Unshuffling~\cite{teney2020unshuffling} 
+&42.39 &47.72 &14.43 &\cellcolor{cyan!10}{47.24} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+Unshuffling+CF~\cite{teney2020learning} 
+&40.60 &61.30 &15.60 &\cellcolor{cyan!10}{46.00} 
+&63.30 &79.40 &45.50 &\cellcolor{cyan!10}{53.70} 
+\\
+
+Unshuffling+CF+GS~\cite{teney2020learning}
+&46.80 &64.50 &15.30 &\cellcolor{cyan!10}{45.90}
+&62.40 &77.80 &43.80 &\cellcolor{cyan!10}{53.60}
+\\ 
+
+% *********************************************************************
+% \cmidrule(lr){2-9}
+\midrule
+UpDn~\cite{anderson2018bottom} 
+&38.82  &42.98  &12.18  &\cellcolor{cyan!10}{43.95} 
+&64.73  &79.45  &49.59  &\cellcolor{cyan!10}{55.66}  
+\\
+
+\, + Top answer masked~\cite{teney2020value} 
+&40.61  &82.44  &27.63  &\cellcolor{cyan!10}{22.26} 
+&30.90  &44.12  &5.00  &\cellcolor{cyan!10}{20.85} 
+\\ 
+\, + AdvReg~\cite{grand2019adversarial} 
+&36.33  &59.33  &14.01  &\cellcolor{cyan!10}{30.41} 
+&50.63  &67.39  &38.81  &\cellcolor{cyan!10}{38.37} 
+\\ 
+\, + GRL~\cite{grand2019adversarial}
+&42.33 &59.74 &14.78 &\cellcolor{cyan!10}{40.76} 
+&56.90 &69.23 &42.50 &\cellcolor{cyan!10}{49.36} 
+\\
+
+\, + RUBi~\cite{cadene2019rubi} 
+&47.11 &68.65 &20.28 &\cellcolor{cyan!10}{43.18} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+\, + RandImg ($\lambda$=12)~\cite{teney2020value} 
+&55.37  &83.89  &41.60  &\cellcolor{cyan!10}{44.20}  
+&54.24  &64.22  &34.40  &\cellcolor{cyan!10}{50.46}
+\\
+\, + RandImg ($\lambda$=5)~\cite{teney2020value}
+&51.15  &75.06  &24.30  &\cellcolor{cyan!10}{45.99}  
+&59.28  &70.66  &43.06  &\cellcolor{cyan!10}{53.40} 
+\\ 
+
+\, + CF-VQA (Sum)~\cite{niu2021counterfactual}
+&53.69 &91.25 &12.80 &\cellcolor{cyan!10}{45.23} 
+&-- &-- &-- &\cellcolor{cyan!10}{--}  
+\\
+
+\, + CF-VQA (Har.)~\cite{niu2021counterfactual}
+&49.94 &74.82 &18.93 &\cellcolor{cyan!10}{45.42} 
+&-- &-- &-- &\cellcolor{cyan!10}{--}  
+\\
+
+\, + DLR~\cite{jing2020overcoming} 
+&48.87 &70.99 &18.72 &\cellcolor{cyan!10}{45.57}  
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+\, + HINT(HAT)$^{\dagger}$~\cite{selvaraju2019taking} 
+&47.70 &70.04 &10.68 &\cellcolor{cyan!10}{46.31} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+\, + SCR (HAT)$^{\dagger}$~\cite{wu2019self} 
+&49.17 &71.55 &10.72 &\cellcolor{cyan!10}{47.49} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+\, + SCR (VQA-X)$^{\dagger}$~\cite{wu2019self} 
+&49.45 &72.36 &10.93 &\cellcolor{cyan!10}{48.02} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+\, + SL~\cite{zhu2020overcoming} 
+&57.59 &86.53 &29.87 &\cellcolor{cyan!10}{50.03}  
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+\, + MUTANT$^{\dagger}$~\cite{gokhale2020mutant}
+&61.72 &88.90 &49.68 &\cellcolor{cyan!10}{50.78} 
+&-- &-- &-- &\cellcolor{cyan!10}{--} 
+\\
+
+\, \textbf{+ X-GGM} 
+&45.71  &43.48  &27.65  &\cellcolor{cyan!10}{{52.34}}   
+&67.16  &83.74  &48.26  &\cellcolor{cyan!10}{{56.91}} 
+\\ 
+
+% \cmidrule(lr){2-9}
+% *********************************************************************
+\midrule
+LXMERT$^{*}$~\cite{tan2019lxmert} 
+&63.90 &80.45 &46.58 &\cellcolor{cyan!10}{{59.98}} 
+&75.57 &91.39 &59.83 &\cellcolor{cyan!10}{65.21}
+\\
+
+\, + MUTANT$^{\dagger}$~\cite{gokhale2020mutant}
+&{69.52} &93.15 &67.17 &\cellcolor{cyan!10}{57.78} 
+&- &- &- &\cellcolor{cyan!10}{-} 
+\\
+
+\, + VILLA$^*$~\cite{gan2020large} 
+&48.06 &42.66 &18.97 &\cellcolor{cyan!10}{58.89} 
+&{75.85} &90.40 &60.02 &\cellcolor{cyan!10}{{66.66}} 
+\\
+
+\, + MCE+Adv~\cite{clark2020learning} 
+&66.08 &-- &-- &\cellcolor{cyan!10}{--}
+&{\text{77.17}} &-- &-- &\cellcolor{cyan!10}{--}
+\\
+
+\, + MCE~\cite{clark2020learning} 
+&{68.44} &-- &-- &\cellcolor{cyan!10}{--}
+&74.03 &-- &-- &\cellcolor{cyan!10}{--}
+\\
+
+\, \textbf{+ X-GGM} 
+&66.95 &78.91 &53.63 &\cellcolor{cyan!10}{{\textbf{64.33}}} 
+&75.88 &90.18 &60.06 &\cellcolor{cyan!10}{{\textbf{66.92}}} 
+\\
+\bottomrule
+\end{tabularx}
+}
+\end{table}

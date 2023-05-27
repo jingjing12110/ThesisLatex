@@ -1,0 +1,63 @@
+\begin{table}[!t]
+\caption{关于使用$\mathcal{L}_D$和$\mathcal{L}_{\nabla}$的不同损失组合训练R-GGM和N-GGM的消融实验
+% 。 \textcolor{blue}{$\uparrow$} (\textcolor{red}{$\downarrow$}) 表示值越高（低）越好。
+}
+\label{tab:c3_abl_comps}
+\setlength{\tabcolsep}{3.24mm}{
+\begin{tabularx}{\textwidth}{ccccccccccc}
+\toprule
+\multirow{2}{*}{S/N}
+&\multicolumn{2}{c}{R-GGM}
+&\multicolumn{2}{c}{N-GGM} 
+&\multicolumn{3}{c}{VQA-CP v2 ``Other'' (\%)}
+&\multicolumn{3}{c}{GQA-OOD (\%)} 
+\\
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-5}
+\cmidrule(lr){6-8}
+\cmidrule(l){9-11}
+
+&\small $\mathcal{L}_{\nabla}$ 
+&\small $\mathcal{L}_D$ 
+&\small $\mathcal{L}_{\nabla}$
+&\small $\mathcal{L}_D$ 
+&\small OOD\textcolor{blue}{$\uparrow$}
+&\small ID\textcolor{blue}{$\uparrow$}
+&\small Gap\textcolor{red}{$\downarrow$} 
+&\small Tail\textcolor{blue}{$\uparrow$} 
+&\small Head\textcolor{blue}{$\uparrow$} 
+&$\Delta$\textcolor{red}{$\downarrow$}
+\\
+\midrule
+\rowcolor{gray!15}LXMERT
+&\multicolumn{4}{c}{---} 
+&59.98 &65.21 &5.23 
+&49.80 &57.70 &15.90 \\ 
+% \hline 
+\#1 &\checkmark &\checkmark & & 
+&63.84 &66.41 &2.57 
+&51.39 &56.93 &10.77 
+\\
+\#2 & & &\checkmark &\checkmark 
+&62.90 &65.57 &2.67
+&51.27 &57.30 &11.76
+\\
+% \hline 
+\#3 &\checkmark & &\checkmark & 
+&63.75 &66.03 &\textbf{2.28} 
+&51.65 &57.13 &10.61 
+\\ 
+\#4 & &\checkmark & &\checkmark 
+&62.73 &65.99 &3.26 
+&51.27 &57.19 &11.54 
+\\
+% \hline 
+\#5 &\checkmark &\checkmark &\checkmark &\checkmark 
+&\textbf{64.33} &\textbf{66.92} &2.59 
+&\textbf{52.47} &\textbf{57.51} &\textbf{9.59} 
+\\
+\bottomrule
+\end{tabularx}
+} % scale box
+\end{table}
+% *********************************************************************

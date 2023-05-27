@@ -1,0 +1,35 @@
+\begin{table}[!t]
+\caption{在MSRVTT-QA和KnowIT-VQ数据集上视觉编码器和语言编码器分别使用GCN和FC的性能比较
+% 。\#9和\#10同表~\ref{tab:c2_abl_comps}。
+}
+\label{tab:c2_abl_GCN2FC} 
+\setlength{\tabcolsep}{3.35mm}{
+\begin{tabularx}{\textwidth}{lcccccccc}
+\toprule
+\multirow{2}{*}{S/N} 
+&\multicolumn{2}{c}{Visual Encoder}
+&\multicolumn{2}{c}{Linguistic Encoder} 
+&\multicolumn{2}{c}{DaVL} 
+&\multirow{2}{*}{MSRVTT-QA~\cite{xu2017video}} 
+&\multirow{2}{*}{KnowIT-VQ~\cite{garcia2020knowit}} 
+\\ 
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-5}
+\cmidrule(lr){6-7}
+
+&\footnotesize{GCN} &\footnotesize{FC} &\footnotesize{GCN} &\footnotesize{FC} &$\ev_{no}$ &$\ev_{da}$ & & 
+\\
+\midrule
+\#11 & &\checkmark & &\checkmark &\checkmark & &40.32\% &68.12\% 
+\\ 
+\#9 &\checkmark & &\checkmark & &\checkmark & &56.16\% &73.79\% 
+\\
+\#12 & &\checkmark & &\checkmark & &\checkmark &52.96\% &73.01\% 
+\\
+\#10 &\checkmark & &\checkmark & & &\checkmark &\textbf{59.44\%} &\textbf{77.10\%} 
+\\
+\bottomrule
+\end{tabularx}
+} % scale box
+\end{table}
+

@@ -1,0 +1,647 @@
+% !TeX root = ../main.tex
+% **************************************************************************
+\xchapter{基于冗余感知参数有效微调的低资源视觉问答方法}{MixPHM: Redundancy-Aware Parameter-Efficient Tuning for Low-Resource Visual Question Answering}
+
+
+视觉语言预训练以“先预训练后微调”的方式将下游视觉问答任务的性能提升至人类水平。但随着预训练模型规模的不断增大，在低资源情况下微调模型所有参数不仅显著地增加了计算和存储成本，还会面临过拟合等问题。尽管现有的参数有效微调方法极大地减少了可调参数的数量，但与全模型微调相比，其性能仍存在明显的差距。本章提出了一种冗余感知的参数有效微调方法 （Mixture-of-PHM，MixPHM）。结构上，MixPHM是一种采用多个PHM专家以混合专家的方式实现的轻量模块。为了降低专家的参数冗余，本章在低秩子空间中重参数化了专家的权重，并在MixPHM内部以及不同MixPHM之间共享部分权重。此外，本章根据对表征冗余的定量分析提出了“冗余正则化”，以减少MixPHM输出表征中与任务不相关的冗余并促进任务相关的关联。在三个视觉问答数据集上不同低资源设置下进行的广泛实验表明与已有的参数有效微调方法相比，MixPHM是现有唯一在所有数据集上性能都优于全模型微调的参数有效微调方法，验证了MixPHM在性能和参数有效性层面的优越性。
+
+
+
+% **************************************************************************
+\xsection{引言}{Introduction}
+
+视觉语言预训练模型~\cite{wang2022image,wang2022ofa,yuan2021florence,wang2021simvlm,wang2021vlmo,dou2022empirical,li2022blip}以先预训练后微调的方式显著地提高了以视觉问答~\cite{antol2015vqa}为代表的下游任务的性能。
+这使得基于视觉语言预训练的视觉问答模型在标准视觉问答数据上的性能甚至已经超过了人类水平。
+标准的全模型微调是在给定的下游任务上调节模型的所有参数。随着预训练模型规模的不断扩大，这种参数调节机制极大地增加了计算和存储成本，并在低资源场景下面临着过拟合等问题。
+为了应对这些挑战，最近的工作已经开始探索参数有效的微调技术。
+在许多自然语言处理任务中~\cite{mahabadi2021parameter,yang2022prompt,ruckle2021adapterdrop,mao2022unipelt,he2022towards,yang2022robust,zhang2022differentiable}，大规模预训练模型的参数有效微调已经取得了巨大的成功。
+这些方法通常保持大部分预训练模型权重冻结，仅更新部分模型参数或向预训练模型中添加轻量级的可训练模块。
+然而，在视觉语言领域，对参数有效微调方法的探索则相对较少。
+% 已有的工作~\cite{zhang2022hyperpelt,sung2022vl}多是直接将自然语言处理领域中的方法迁移和整合到视觉语言任务中。
+% 这样的方式一定程度上忽略了视觉语言任务，尤其是视觉问答任务的复杂性。
+
+
+如图~\ref{fig:c5_acc_param}所示，已有的参数有效微调方法虽然确实极大地减少了模型可训练参数量，但性能仍然落后于全模型微调方法。
+其中，基于Adapter的方法（Houlsby~\cite{houlsby2019parameter}、 Pfeiffer~\cite{pfeiffer2020adapterfusion}、 Compacter~\cite{karimi2021compacter}和AdaMix~\cite{wang2022adamix}）更加存储高效，因为它们仅存储新添加的轻量模块，而不是整个视觉语言预训练模型的副本。
+此外，它们还允许更灵活的参数共享~\cite{sung2022vl}。
+特别是，AdaMix使用了专家混合~\cite{shazeer2017outrageously}结构增强了适配器的容量，并且在略微增加可调参数数量的同时实现了与全模型微调相当的性能。
+
+
+% ********************************************************************
+\begin{figure}
+\centering
+\includegraphics[width=.56\linewidth]{figure/c5_F1.pdf}
+\caption{不同参数有效微调方法间性能和训练参数量的对比
+}
+\label{fig:c5_acc_param}
+\end{figure}
+% ********************************************************************
+
+
+本章在Adapter方法的基础上，研究更为参数有效并能在低资源视觉问答任务中胜过全模型微调的模型微调方法。
+具体来说，在将预训练后的视觉语言模型迁移到给定的下游任务时，本章考虑了两个层面的改进：
+(\emph{i}) 在保持Adapter容量的同时减少参数冗余。
+过度减少可调参数量可能会导致欠拟合问题并妨碍Adapter学习充分的任务相关信息~\cite{karimi2021compacter}，因此，在参数效率和容量之间取得平衡至关重要。
+(\emph{ii}) 减少表征中与任务无关的冗余同时促进表征中与任务相关的关联。
+Adapter利用残差连接将从目标数据集中学到的与任务相关的信息和预训练视觉语言模型中已经蕴涵的先验知识进行整合。
+然而，最新的研究~\cite{jiang2022finetuning,mahabadi2021variational,wang2021infobert}表明，预训练模型不可避免地包含与目标任务无关的冗余信息，这会导致表征和标签之间的统计虚假相关，进而妨碍模型的性能和泛化~\cite{tishby2015deep,wang2022rethinking}。
+为了提高Adapter的有效性，本章期望它能够学习尽可能多的与任务相关的信息，同时丢弃来自于预训练模型冗余的和与任务不相关的信息。
+
+
+本章提出了一种冗余感知的参数有效微调方法（Mixture-of-PHM，MixPHM）以完成上述两层面的改进。
+该方法能够在减少可调参数量的同时，有效地减少表征中与任务无关的冗余并促进与任务相关的信息关联。
+在结构上，MixPHM由多个PHM专家以专家混合的方式实现。
+为了减少MixPHM中的参数冗余，本章首先将专家的权重进行分解并在低秩子空间进行重参数化。
+随后，本章进一步利用全局和局部权重共享策略来减少参数量并传输信息。
+为了实现第二种层次的改进(\emph{ii})，本章首先对Adapter中的表征冗余进行量化。
+结果表明，Adapter的表征与预训练视觉语言模型的表征之间存在大量冗余，但与最终任务使用的表征之间的相关性较小。然后，基于这一发现，本章提出了冗余正则化。在MixPHM中，该冗余正则化通过对MixPHM的表征和预训练模型获得的表征之间的相似矩阵进行去相关来减少任务不相关的冗余。同时，它通过最大化MixPHM的表征和最终任务使用表征之间的互信息来促进任务相关的表征相关性。
+
+
+本章的主要贡献概括如下：
+\begin{itemize}
+\item 提出了冗余感知的参数有效微调方法。在为低资源视觉问答任务微调视觉语言预训练模型时，该方法在性能和参数有效性之间实现了更好的权衡，显著地的提升了模型在低资源场景下的学习能力，是现有唯一在所有数据集上不同低资源设置下性能都优于全模型微调的参数有效微调方法。
+\item 基于对Adapter中表征冗余的定量分析提出了冗余正则化。该正则器可以有效减少表征中与任务无关的冗余并促进与任务相关信息的关联，进而促进模型学习表征和标签之间更真实的关系。
+\end{itemize}
+
+
+
+
+
+% **************************************************************************
+\xsection{预备知识}{Preliminary}
+
+本节首先描述低资源设置下视觉问答的任务设置；然后简单回顾了专家混合模型和参数化超复数网络的相关知识。
+
+\xsubsection{任务的表述}{Problem Definition}
+根据最新的相关研究~\cite{cho2021unifying,wang2022simvlm}，本章将视觉问答任务表述为一个文本生成任务，即为给定的问题生成自由形式的文本答案，而不是从预定义的答案集中选择一个特定的答案。
+形式上，本章用$\mathcal{D}=\{(I, Q, y)\in \mathcal{I}\times \mathcal{Q}\times \mathcal{Y} \}$表示给定的视觉问答数据集，其中$I$表示图像，$Q$表示问题，$y$是对应的答案。
+设置给定的视觉语言预训练模型$\mathcal{M}_{\Theta}$由小量可训练参数集合$\thetav$参数化。
+因此，为视觉问答微调视觉语言预训练模型的任务可以表述为以参数有效的方式在数据集$\mathcal{D}$上微调$\mathcal{M}_{\thetav}$。 
+
+\xsubsection{标准专家混合模型}{Mixture-of-Experts}
+专家混合模型是一种典型的条件计算模型。一个标准的专家混合模型通常由$N_e$个专家网络$\{{E}_i\}_{i=1}^{N_e}$ 和一个门控网络${G}$构成。
+每个专家都是一个具有独特权重的子神经网络，可以从输入的特定任务子集中学习。
+而门控网络${G}$ 则用来条件地激活$N_a$ ($1\le N_a \le N_e$)个专家。
+形式上，给定输入表征 $\xv \in \mathbb{R}^{d}$，第$i$个专家${E}_i(\cdot): \xv \rightarrow \mathbb{R}^{d_e}$ 将$\xv$ 映射到维度为$d_e$的空间，门控网络${G}(\cdot): \xv \rightarrow \mathbb{R}^{N_e}$ 生成稀疏的${N_e}$维向量，稀疏专家模型的输出$\yv \in \mathbb{R}^{d_e}$ 则可以表述为：
+\begin{equation} 
+\begin{aligned} 
+\yv = \sum_{i=1}^{N_e} {G}(\xv)_i {E}_i(\xv),
+\end{aligned}
+\label{eq:moe} 
+\end{equation}
+式中，${G}(\xv)_i$ 表示将 $\xv$分配到第$i$个专家的概率，满足 $\sum_{i=1}^{N_e} {G}(\xv)_i = 1$。
+
+\xsubsection{参数化超复数网络}{Parameterized Hypercomplex Multiplication}
+参数化超复数网络（Parameterized Hypercomplex Multiplication，PHM）~\cite{zhang2021beyond} 旨在通过从数据中学习乘法规则来将超复数乘法推广到全连接网络层中。
+形式上，对于将$\xv \in \mathbb{R}^{d}$ 映射为$\yv \in \mathbb{R}^{d_e}$ 的全连接层，表述如下：
+\begin{equation} 
+\begin{aligned} 
+\yv = \Wmat^{\Transpose}\xv + \bv, 
+\end{aligned}
+\label{eq:fc} 
+\end{equation}
+式中，$\Wmat \in \mathbb{R}^{d \times d_e}$，$\bv \in \mathbb{R}^{d_e}$。
+在PHM层中，$\Wmat$则可以通过$n$对矩阵$\Smat_j \in \mathbb{R}^{n \times n}$ 和 $\Amat_j \in \mathbb{R}^{\frac{d}{n} \times \frac{d_e}{n}}$之间克罗内克乘积（Kronecker product）的和来学习：
+\begin{equation} 
+\begin{aligned} 
+\Wmat = \sum_{j=1}^{n} \Smat_j \otimes \Amat_j, 
+\end{aligned}
+\label{eq:phm} 
+\end{equation}
+式中，超参数$n \in \mathbb{Z}_{> 0}$，且满足$d$ 和 $d_e$能被$n$整除，$\otimes$表示克罗内克乘积。
+例如，$\Smat \in \mathbb{R}^{m \times k}$ 和 $\Amat \in \mathbb{R}^{p \times q}$之间的克罗内克乘积为块矩阵$\Smat \otimes \Amat \in \mathbb{R}^{mp \times kq}$，即：
+\begin{equation} 
+\begin{aligned} 
+\Smat \otimes \Amat = 
+\begin{bmatrix}
+s_{11}\Amat &\cdots &s_{1k}\Amat \\
+\vdots &\ddots &\vdots \\
+s_{m1}\Amat &\cdots &s_{mk}\Amat 
+\end{bmatrix}, 
+\end{aligned}
+\label{eq:kp} 
+\end{equation}
+式中，$s_{ij}$表示矩阵$\Smat$中第$i$行$j$列的元素。
+如此，用PHM层替代全连接层可以将全连接层的可训练参数降低到原来的$1/{n}$。
+
+
+% **************************************************************************
+\xsection{冗余感知的参数有效微调方法}{Redundancy-Aware MixPHM} 
+
+
+本章首先量化并分析了Adapter在低资源视觉问答任务中的表征冗余。
+然后，本章详细阐述了本章所提MixPHM的结构、冗余正则化和推理过程。
+
+
+
+% ********************************************************************
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.6\linewidth]{figure/c5_adapter.pdf}
+\caption{标准Adapter的结构示意图 }
+\label{fig:c5_adapter}
+\end{figure}
+% ********************************************************************
+
+
+% **************************************************************************
+\xsubsection{Adapter中的冗余分析}{Rethinking Redundancy in Adapter}
+\label{sec:revist}
+
+Adapter~\cite{houlsby2019parameter} 是一种典型的参数有效微调技术，本质上是一个轻量级的神经网络模块。
+如图~\ref{fig:c5_adapter}所示，Adapter通常由一个两层的瓶颈结构的前馈神经网络、一个非线性函数和一个残差连接来实现。
+在学习下游任务时，Adapter被插入到Transformer的层中，且只有新增加的Adapter的参数会被更新，而原始预训练模型的参数保持不变。
+形式上，给定Adapter的输入表征$\hv \in \mathbb{R}^d$，下采样投影层 $\Wmat^{\text{dn}} \in \mathbb{R}^{d \times d_r}$ 将 $\hv$ 映射到由瓶颈维度$d_r$ 确定的低维空间，满足$\hv_r \in \mathbb{R}^{d_r}$。
+上采样投影层$\Wmat^{\text{up}} \in \mathbb{R}^{d_r \times d}$将 $\hv_r$ 映射回原来的表征空间，即，$\hv_a \in \mathbb{R}^d$。
+考虑残差连接和非线性函数$f(\cdot)$，Adapter的定义如下：
+\begin{align} 
+&\hv_a = f(\hv \Wmat^{\text{dn}}) \Wmat^{\text{up}}, \\
+&\hv \leftarrow \hv_a + \hv. 
+\label{eq:adapter} 
+\end{align}
+理想情况下，通过整合来自给定的下游数据集特定任务信息和已经编码在视觉语言预训练模型中的先验知识，基于Adapter的参数有效微调技术可以快速有效地使视觉语言预训练模型适应新任务。
+此外，与视觉语言预训练模型的全模型微调相比，基于Adapter的微调只更新少数可训练的参数，这可以避免低资源学习的过度参数化问题。
+
+
+
+然而，最新的研究~\cite{he2021effectiveness} 表明在使用Adapter进行微调后，预训练模型的权重通常保持在接近其初始权重的水平。这意味着由Adapter获得的信息中存在着冗余。
+为此，本章使用表征相似度分析（Representational Similarity Analysis，RSA）~\cite{laakso2000content} 来评估不同表征空间之间的相似性\footnote[1]{RSA相似性即为两个相似矩阵上三角元素之间的Pearson相关系数，本章中采用表征间的余弦相似矩阵。}。
+具体来说，本章首先使用Pfeiffer-Adapter~\cite{pfeiffer2020adapterfusion}在从VQA v2训练集中随机采样的1000个样本上微调视觉语言预训练模型VL-T5~\cite{cho2021unifying}。
+然后，本章在从VQA v2验证集中随机采样的1000个样本上计算Adapter残差连接前的输出$\hv_a$和残差项$\hv$之间，以及$\hv_a$和$\tilde{\hv}$ 之间的RSA相似性。
+在Transformer的编码器和解码器中，$\tilde{\hv}$分别是编码器和解码器最终池化后的输出。
+最后，对于每个样本，本章可以从Transformer每层的输出获得$N_t$个token级别的表征，即，$\mathbf{H} = \{\hv\}_{i=1}^{N_t} \in \mathbb{R}^{N_t\times d}$，$\mathbf{H}_a = \{\hv_a\}_{i=1}^{N_t}  \in \mathbb{R}^{N_t\times d}$ 和 $\tilde{\mathbf{H}} = \{\tilde{\hv}\}_{i=1}^{N_t}  \in \mathbb{R}^{N_t\times d}$。
+则，RSA计算公式可表述如下：
+\begin{align} 
+&\text{RSA}(\hv_a, \hv) = f_{\rho}(f_{\text{U}}[\mathbf{H}_a \mathbf{H}_a^{\Transpose}], f_{\text{U}}[\mathbf{H} \mathbf{H}^{\Transpose}]), \\
+&\text{RSA}(\hv_a, \tilde{\hv}) = f_{\rho}(f_{\text{U}}[\mathbf{H}_a \mathbf{H}_a^{\Transpose}], f_{\text{U}}[\tilde{\mathbf{H}} \tilde{\mathbf{H}}^{\Transpose}]),
+\label{eq:adapter_rsa} 
+\end{align}
+式中，$f_{\text{U}}\left[\cdot\right]$表示取矩阵上三角元素的操作，$f_{\rho}$表示计算Pearson相关系数的函数。
+图~\ref{fig:adapter_rsa}中的实验结果表明在编码器和解码器中，$\hv_a$ 和 $\hv$的表征空间十分相似且冗余，而表征$\hv_a$ 和 $\tilde{\hv}$之间相似性则较弱。
+
+
+为了更有效地将预训练视觉语言模型迁移到下游任务，从信息论的角度分析，本章希望Adapter学到的表征$\hv_a$在减少与原始视觉语言预训练模型生成的表征$\hv$之间的冗余的同时尽可能多的包含与给定任务相关的信息$\tilde{\hv}$。
+然而，图~\ref{fig:adapter_rsa}中的结果却表明Adapter编码后的表征$\hv_a$蕴涵大量与原始视觉语言预训练模型冗余的信息，而希望Adapter学到的与下游任务相关的信息则相对较少。
+因此，要提高Adapter的有效性，鼓励$\hv_a$ 和 $\tilde{\hv}$之间任务相关的关联并减少$\hv_a$ 和 $\hv$之间任务无关的冗余则十分重要。
+
+
+
+% *******************************************************
+\begin{figure}[!t]
+\begin{subfigure}[b]{.48\linewidth}
+\centering
+\includegraphics[width=0.89\linewidth,height=0.7\linewidth]{figure/c5_adapter_rsa_f1.pdf}
+\subcaption{$\hv_a$ 和 $\hv$表征空间RSA相似性}
+\end{subfigure}%
+\hfill
+\begin{subfigure}[b]{.48\linewidth}
+\centering
+\includegraphics[width=.89\linewidth,height=0.7\linewidth]{figure/c5_adapter_rsa_f2.pdf}
+\subcaption{$\hv_a$ 和 $\tilde{\hv}$表征空间RSA相似性}
+\end{subfigure}
+\caption{Adapter相关表征空间的RSA相似性
+}
+\label{fig:adapter_rsa}
+\end{figure}
+% *******************************************************
+
+
+
+% **************************************************************************
+\xsubsection{MixPHM结构}{MixPHM Architecture}
+
+在本章中，本章提出了一种全新的参数有效微调方法，MixPHM，其结构如图~\ref{fig:c5_overall}所示。
+具体来说，本章采用由$L$个编码器和$L$个解码器重复堆叠而成的Transformer作为视觉语言预训练模型的基础模型结构。
+在Transformer第$l$ ($1 \le l \le L$)个模块的前馈层之后，插入由$N_e$个PHM专家$\{E_i^l \}_{i=1}^{N_e}$构成的MixPHM来获取蕴涵在视觉语言预训练模型中的知识并学习与特定任务相关的信息。 
+每个 PHM 专家和 Adapter一样由具有瓶颈结构的下采样投影层和上采样投影层构成。
+为了提高模型的参数有效性，PHM 专家利用参数化超复数乘法操作将投影层参数分解，在低维空间学习专家的权重矩阵。
+此外，最新的研究~\cite{zuo2022taming,wang2022adamix}已经表明随机路由机制无需添加额外训练参数进行专家选择且能避免专家混合模型中常见的负载不均衡问题。
+该属性与参数有效微调的需求密切匹配。
+因此，本章在MixPHM中采用了随机路由机制来确定最匹配的专家。
+
+
+
+% *******************************************************
+\begin{figure}[!t]
+\begin{subfigure}[b]{.7\linewidth}
+\centering
+\includegraphics[width=0.7\linewidth]{figure/c5_mixphm_1.pdf}
+\subcaption{训练（微调）阶段}
+\label{fig:c5_overall_tuning}
+\end{subfigure}%
+\begin{subfigure}[b]{.3\linewidth}
+\centering
+\includegraphics[width=.65\linewidth]{figure/c5_mixphm_2.pdf}
+\subcaption{推理阶段}
+\label{fig:c5_overall_infer}
+\end{subfigure}
+\caption{MixPHM结构示意图
+}
+\label{fig:c5_overall}
+\end{figure}
+% *******************************************************
+
+
+\subsubsection{参数有效微调}
+如图~\ref{fig:c5_overall_tuning}所示，在每次训练（参数有效微调）迭代时，本章随机的从插入到Transformer第$l$个模块的$N_e$个专家中选择一个专家。一旦专家$E_i^l$被选定，在给定批次中的所有输入均会被传入到该专家中。
+形式上，在第$l$个模块中（为简化公式符号，下述公式中上标$l$均被省略），对于输入表征$\hv \in \mathbb{R}^d$，选定的第$i$个专家对$\hv$进行如下编码：
+\begin{equation} 
+\begin{aligned} 
+\hv \leftarrow ~f(\hv \Wmat_i^{\text{dn}})\Wmat_i^{\text{up}} + \hv. 
+\end{aligned}
+\label{eq:adapter_1} 
+\end{equation}
+此时，插入到视觉语言预训练模型中的可训练参数总量为$4LN_e(dd_r)$。
+
+
+为了使添加到视觉语言预训练模型中的专家更加参数有效，本章首先使用PHM对公式~(\ref{eq:adapter_1})中的参数矩阵$\Wmat_i^{\text{dn}}$ 和 $\Wmat_i^{\text{up}}$进行分解。
+另外，考虑到Compacter~\cite{karimi2021compacter} 已经证明对PHM进一步低秩分解仍能保持未分解前的性能，本章因此在一个低秩的子空间学习PHM的变换矩阵，即：
+% \begin{equation} 
+\begin{align} 
+&\Wmat_i^{\text{dn}} = \sum_{j=1}^{n} \Smat_{i,j} \otimes \Amat_{i,j}^{\text{dn}}
+= \sum_{j=1}^{n} \Smat_{i,j} \otimes (\Tmat_{i,j}^{\text{dn}} (\Umat_{i,j}^{\text{dn}})^{\Transpose})
+, \\
+&\Wmat_i^{\text{up}} = \sum_{j=1}^{n} \Smat_{i,j} \otimes \Amat_{i,j}^{\text{up}}
+= \sum_{j=1}^{n} \Smat_{i,j} \otimes (\Tmat_{i,j}^{\text{up}} (\Umat_{i,j}^{\text{up}})^{\Transpose})
+, 
+\label{eq:ada_phm}
+\end{align}
+% \end{equation}
+式中，$\Tmat_{i,j}^{\text{dn}} \in \mathbb{R}^{\frac{d}{n}\times d_k}$, $\Umat_{i,j}^{\text{dn}} \in \mathbb{R}^{\frac{d_r}{n}\times d_k}$, $\Tmat_{i,j}^{\text{up}} \in \mathbb{R}^{\frac{d_r}{n}\times d_k}$, $\Umat_{i,j}^{\text{up}} \in \mathbb{R}^{\frac{d}{n}\times d_k}$，$d_r$表示矩阵秩的维度。
+
+
+\subsubsection{PHM专家间信息传递与权重共享}
+在将预训练模型迁移到下游任务时，第$i$个PHM专家的$n$个参数矩阵$\{\Smat_{i,j}\}_{j=1}^n$ 在Transformer所有层的所有专家间参数共享，用以捕获目标任务相关的通用信息。
+与之相对的是，$\{\Amat_{i,j}^{\text{dn}}\}$ 和 $\{\Amat_{i,j}^{\text{up}}\}$ 是专家特有的权重矩阵，旨在捕获Transformer各层独立的信息。
+此外，为了更好地在 MixPHM 的 PHM 专家之间传递信息并进一步减少参数冗余，本章在MixPHM内部PHM专家间局部共享$\{\Amat_{i,j}^{\text{dn}}\}_{j=1}^n$的参数。
+至此，插入到视觉语言预训练模型中的可训练参数总量减少到$2Ld_k(d+d_r)(N_e + 1) + n^3$。
+
+
+
+
+\xsubsection{冗余正则化}{Redundancy Regularization}
+
+减少表征间的冗余能在一定程度上提升视觉语言预训练模型的泛化能力~\cite{jiang2022finetuning}。
+此外，正如本章在~\ref{sec:revist}节中的讨论一样，在进行参数有效微调时应使专家学到的表征在减少与原始视觉语言预训练模型生成的表征之间的冗余的同时尽可能多的包含与给定任务相关的信息。
+为此，本章提出了冗余正则化。
+具体来说，对于插入到Transformer第$l$个模块的MixPHM，本章将其每个批次中token级别的输出$\{\hv_a\}_{i=1}^{N}$和残差$\{\hv\}_{i=1}^{N}$堆叠为$\Zmat_a \in \mathbb{R}^{N \times d}$ 和 $\Zmat \in \mathbb{R}^{N \times d}$（$N=N_bN_t$，$N_b$表示批次大小）。
+对于Transformer编解码器，本章沿着token维度对批次的最终输出表征$\{\tilde{\hv}\}_{i=1}^{N}$进行平均，并获得全局的任务相关表征$\{\bar{\hv} \}_{i=1}^{N_b}$。
+则，冗余正则化可以表示为：
+\begin{equation}
+\mathcal{L}_{\text{Ra}} \triangleq \sum_i^N \sum_{j \neq i}^N \frac{\Zmat_a \Zmat^{\Transpose}}{\left\|\Zmat_a\right\|_2 \left\|\Zmat\right\|_2} - \sum_i^{N_b}\sum_j^{N_t} \hat{\mathcal{I}}({\hv_{a}}_{i,j}; \bar{\hv}_{i}),
+\label{eq:L_Ra} 
+\end{equation} 
+式中，$\left\|\cdot\right\|_2$表示$L_2$范数，$\hat{\mathcal{I}}(\cdot;\cdot)$表示互信息的估计，${\hv_{a}}_{i,j}$是批次中第$i$个样本的第$j$个token的输出表征。
+在本章节，本章采用JSD~\cite{hjelm2019learning}互信息估计器来最大化两个表征之间的互信息。
+在冗余正则$\mathcal{L}_{\text{Ra}}$中，第一项是冗余度减少项，它通过将$\hv_a$和$\hv$之间的余弦相似性矩阵的非对角元素近似为零，鼓励$\hv_a$从预训练的视觉语言模型中丢弃与任务无关的信息。
+第二项旨在通过最大化$\hv_a$和$\bar{\hv}$之间的互信息，倡导$\hv_a$包含更多来自下游数据集的任务相关信息。
+
+将视觉问答任务表述为文本生成任务时，训练目标是在给定输入图像$I$和问题$Q$时，最小化答案$y$的负对数似然。
+因此，参数有效微调中总的训练损失为：
+\begin{equation}
+\begin{aligned}
+\mathcal{L} = -\sum_{j=1}^{|y|}\log P_{\thetav}(y_j|y_{<j}; I, Q) + \alpha \mathcal{L}_{\text{Ra}}, 
+\label{eq:L_total}
+\end{aligned}
+\end{equation} 
+式中，$\alpha$为用于平衡冗余正则的权重系数。
+
+
+
+\xsubsection{推理}{Inference}
+在推理阶段，与训练中使用的随机路由机制不同，如图~\ref{fig:c5_overall_infer}所示，本章采用权重聚合~\cite{wortsman2022model}的方式来合并MixPHM中 $N_e$ 个专家权重为一个最终的专家，然后用这个权重合并后的专家进行表征编码。
+具体来说，每个插入到Transformer模块中的MixPHM都具有$N_e$个瓶颈结构的PHM专家。
+在低秩空间学习PHM时，一个PHM专家具有$2n$ 个专家特有的参数矩阵 $\{\Tmat_j^{\text{up}}, \Umat_j^{\text{up}}\}_{j=0}^n$。
+而这$N_e$个专家有$2n$个相同的局部权值共享的矩阵$\{\Tmat_j^{\text{dn}}, \Umat_j^{\text{dn}}\}_{j=0}^n$和$n$个全局权值共享的矩阵$\{\Smat_j \}_{j=1}^n$。
+为了获得MixPHM 最终的单一专家输出，本章首先通过平均$N_e$ 个PHM专家的上投影参数矩阵来合并对应的权重。
+数学上，第$j$ 组上投影参数矩阵的计算如下：
+\begin{equation}
+\begin{aligned}
+\widetilde{\Tmat}_j^{\text{up}} = \frac{1}{N_e} \sum_{i=1}^{N_e} \Tmat_{ji}^{\text{up}}, \quad
+\widetilde{\Umat}_j^{\text{up}} = \frac{1}{N_e} \sum_{i=1}^{N_e} \Umat_{ji}^{\text{up}}. 
+\label{eq:weight_merge}
+\end{aligned}
+\end{equation} 
+由于全局和局部权重共享，本章无需在$\{\Smat_j \}_{j=1}^n$ 和 $\{\Tmat_j^{\text{dn}}, \Umat_j^{\text{dn}}\}_{j=0}^n$ 上执行权重聚合。
+最后，本章使用合并后的一个PHM专家来计算MixPHM的最终输出。
+
+
+
+% **************************************************************************
+\xsection{实验及结果分析}{Experiment and Result Analysis}
+
+\xsubsection{实验设置}{Experimental Setting}
+
+\subsubsection{数据集}
+本章在VQA v2 验证集~\cite{goyal2017making}、GQA 测试集~\cite{hudson2019gqa} 和 OK-VQA 测试集~\cite{marino2019ok} 上评估了本章提出的MixPHM及其他基线参数有效微调方法的性能。
+为了模拟视觉问答低资源学习设置，本章根据 Chen 等人~\cite{chen2022revisiting} 的相关研究将训练集样本个数$N_{\mathcal{D}}$少于1000的视觉问答视为低资源视觉问答。
+此外，为了进行更真实的低资源学习，本章根据最新相关研究~\cite{perez2021true,gao2021making} 采用与训练集样本数相同的开发集$\mathcal{D}_{\text{dev}}$ 进行最佳模型选择和超参搜索，即$|\mathcal{D}_{\text{dev}}|=$  $|\mathcal{D}_{\text{train}}|=$ $N_{\mathcal{D}}$。
+具体来说，本章在训练样本数为$N_{\mathcal{D}} \in \{16, 32, 64, 100, 500, 1000\}$ 时进行了大量相关实验。
+数据集的具体构建过程如下：
+为了构建 VQA v2 的$\mathcal{D}_{\text{train}}$ 和 $\mathcal{D}_{\text{dev}}$，本章首先随机从VQA v2的训练集中采样$2N_{\mathcal{D}}$ 个样本，然后将采样得到的样本平均分配到$\mathcal{D}_{\text{train}}$ 和 $\mathcal{D}_{\text{dev}}$ 中。
+类似地，本章从GQA 的训练集和验证集以及OK-VQA的训练集中采样构建它们各自的$\mathcal{D}_{\text{train}}$ 和 $\mathcal{D}_{\text{dev}}$。
+
+
+
+\subsubsection{评价指标}
+本章中，本章使用视觉问答任务标准的性能指标，VQA-Score（见第四章），作为视觉问答任务的评价指标。
+
+
+\subsubsection{基线参数有效微调方法}
+本章将本章提出的MixPHM与全模型微调及最先进的参数有效微调方法进行了比较。
+为了保证比较的公平性，本章对这些方法的关键超参数进行了超参搜索，并报告这些方法的最佳性能。
+具体如下：
+\begin{itemize}
+\item \textbf{Finetuning} 是预训练模型微调的一种基础实践，即在给定的下游视觉问答数据集上调整预训练模型的全部参数。 
+\item \textbf{BitFit}~\cite{zaken2022bitfit} 只调整预训练模型中偏置项的权重，而固定模型其余参数不变。
+\item \textbf{LoRA}~\cite{hu2022lora} 只调整新添加的低秩矩阵，该低秩矩阵用于逼近预训练模型的Transformer每个模块自注意和交叉注意层中Query和Value的权重。
+关键超参数是矩阵的秩。
+\item \textbf{Compacter}~\cite{karimi2021compacter} 在预训练模型Transformer每个模块的前馈层后面添加轻量级的Adapter，并用低秩的PHM~\cite{zhang2021beyond} 对Adapter的权重矩阵进行分解。
+关键超参数是Kronecker乘积的求和次数、表征的维度及矩阵的秩。
+\item \textbf{Houlsby-Adapter}~\cite{houlsby2019parameter} 在预训练模型Transformer每个模块的自注意层和前馈层后面添加轻量级的Adapter，且只调整Adapter的参数。
+关键超参数是表征的维度。
+\item \textbf{Pfeiffer-Adapter}~\cite{pfeiffer2020adapterfusion} 是先通过预实验确定Adapter添加到Transformer的最佳位置，然后再进行相关实验。本章中，本章在预训练模型Transformer每个模块的前馈层后面添加轻量级的Adapter，并且只调整Adapter的参数。
+关键超参数是表征的维度。
+\item \textbf{AdaMix}~\cite{wang2022adamix} 以专家混合的方式在预训练模型Transformer每个模块的前馈层后面添加多个Adapter，并且只调整添加的多个Adapter的参数。
+关键超参数是添加Adapter的数量和表征的维度。
+\end{itemize}
+
+
+
+\subsubsection{实现细节}
+本章在VL-T5~\cite{cho2021unifying}、X-VLM~\cite{zeng2022multi}、BLIP~\cite{li2022blip}和 OFA$_{\text{Base}}$~\cite{wang2022ofa} 四个预训练视觉语言模型上进行了相关实验。
+此外，因为原始的VL-T5~\cite{cho2021unifying} 在预训练过程中使用了上述三个数据集的图像数据，为了避免测试时出现训练中见过的样本，本章加载Jin 等人~\cite{jin2022good} 发布的VL-T5预训练权重\footnote[2]{\href{https://github.com/woojeongjin/FewVLM}{https://github.com/woojeongjin/FewVLM}}。该权重是在预训练时没有利用上述视觉问答数据的情况下获得的。
+所有低资源视觉问答的性能均为在随机种子$\{13, 21, 42, 87, 100\}$ 上五次测试的均值。
+在MixPHM中，本章设置PHM专家数$N_e$为4，专家下采样投影层的瓶颈表征维度$d_r$为64，表示克罗内克乘积个数的超参数$n$ 为4，公式~(\ref{eq:ada_phm}) 中矩阵秩的维度 $d_k$为8，公式~(\ref{eq:L_total}) 中$\alpha$为0.2。
+本章利用PyTorch深度学习框架，在一张NVIDIA GeForce RTX 3090Ti GPU上进行了本章所有实验。
+在训练过程中，本章使用AdamW~\cite{loshchilov2017decoupled}优化器，设置训练最大轮次为1000、批大小为16。
+本章采用5\% 线性预热与衰减的学习率变化策略，峰值学习率为$5\times 10^{-3}$。
+
+
+
+\input{table/c5_all_pet.tex}
+% **************************************************************************
+\xsubsection{与不同方法的性能比较}{Comparison with State-of-the-Arts}
+
+
+表~\ref{tab:c5_all_pet} 展示了在VQA v2 val、GQA test-dev 和 OK-VQA test 上，本章提出的MixPHM与全模型微调以及其他先进的参数有效微调方法的性能比较。
+其中，全模型微调方法（即，\text{Finetuning}）为所有参数有效微调方法提供了性能上界的一种参考。
+总体来说，本章提出的MixPHM在三个视觉问答数据集上不同低资源设置下，性能都超过了其他参数有效微调方法，并且是唯一一个在所有数据集上性能都优于全模型微调的参数有效微调方法。
+接下来，本章将详细分析不同方法之间的差异。
+
+\subsubsection{与AdaMix的性能对比}
+与MixPHM相比，AdaMix同样利用稀疏专家混合模型来提升Adapter的可扩展性和容量。
+然而，结构上，AdaMix只是通过增加专家数量来提升容量，而没有考虑Adapter本身的参数冗余问题。
+这导致模型引入了较多的参数量，而性能提升相对有限。
+此外，在表征层面上，AdaMix也没有考虑表征间的冗余也没有考虑Adapter学到的表征中是否蕴涵足够完成特定下游任务的信息。
+因此，本章认为MixPHM在低资源视觉问答任务上比AdaMix能表现更好且更加参数有效。
+为了验证这一观点，本章在与MixPHM相同的数据集设置下测试了AdaMix在低资源视觉问答任务上的性能。
+与MixPHM一样，本章设置AdaMix的专家数量为4，专家下采样投影层的表征维度为64。
+实验结果如表~\ref{tab:c5_all_pet}所示。
+通过比较AdaMix和MixPHM的实验结果，本章发现无论在何种数据集的设置下，MixPHM的性能始终优于AdaMix的性能，而且AdaMix的性能在绝大多少数据设置下（除了在VQA v2数据集上且训练样本数为32时）性能都未达到全模型微调的方法。
+特别是在训练样本极少时，如$N_{\mathcal{D}} \in \{16, 32, 64\}$，AdaMiX与本章提出的MixPHN之间性能差距显著。
+这些实验结果充分地证明了本章提出的MixPHM在性能和参数上的有效性，也表明了本章方法提出的初衷的合理性。
+
+
+\input{table/c5_fs_vqa.tex}
+
+
+\subsubsection{与基于Adapter的方法的性能对比}
+在MixPHM中，每个PHM专家都具有和Adapter一样的瓶颈结构。
+但与Adapter相比，PHM专家因考虑了上下投影矩阵中的参数冗余而更加参数有效。
+此外，PHM专家还鼓励模型通过减少表征间冗余以及增加Adapter输出和任务表征间的相关性来学习更加任务相关的表征。
+为了分析MixPHM与已有的基于Adapter的参数有效微调方法相比的差异和优势，本章在低资源视觉问答任务上重新实现了Houlsby-Adapter 和 Pfeiffer-Adapter这两种参数有效微调方法。实验时，Adapter下采样投影层的表征维度设置为64。
+经过预实验分析，本章确定Pfeiffer-Adapter添加Adapter的最佳位置是Transformer前馈层之后。
+性能的比较如表~\ref{tab:c5_all_pet} 所示。
+实验结果验证了本章所提方法较Adapter方法在性能和参数有效性等方面的优势。
+
+
+\subsubsection{与Compacter的性能对比}
+为了减少参数冗余，Compacter使用低秩 PHM 参数化Adapter的权重矩阵。
+在结构上，MixPHM中的PHM专家与Compacter相同，都通过矩阵低秩分解减少Adapter的参数量。
+但考虑到视觉问答任务的复杂性，本章在减少模型参数量的同时通过稀疏专家混合的方式来提升模型的容量，避免模型在视觉问答任务上出现欠参数化问题。
+为了分析利用稀疏专家混合来提升模型容量的必要性，本章主要对比Compacter与MixPHM的性能。
+实验结果如表~\ref{tab:c5_all_pet} 所示，Compacter的结果在超参数$n$取4、矩阵秩的维度为8时获得。
+从表中本章发现在低资源视觉问答任务上，Compacter的性能并没有达到预期。其可能的原因如上述分析的一样，即在视觉问答任务上Compacter欠参数化。
+由于视觉问答是一个相对复杂的多模态任务，太少的可训练参数并不能保证视觉问答模型能够在微调中学习复杂的任务相关信息。
+这一结果也表明对于相对复杂的多模态任务，本章需要在保证参数有效的情况下增加模型容量。
+
+
+\subsubsection{与LoRA和BitFit的性能对比}
+LoRA和BitFit是考虑调整视觉语言预训练模型原始参数的参数有效微调方法。
+与已有的基于Adapter的参数有效微调方法相比，更加参数有效。
+但因为LoRA和BitFit是在下游任务上调整视觉语言预训练模型原始参数，所以它们生成的表征蕴涵更多视觉语言预训练模型中的先验知识而学到的任务相关的新知识则会减少，这可能会鼓励模型进行捷径学习进而损害模型的泛化能力。
+为了分析MixPHM较LoRA和BitFit的性能优势，本章在低资源视觉问答任务上复现了这两种典型方法。
+LoRA的关键超参数为重参数化矩阵的秩。
+执行超参数网络搜索后，在低资源视觉问答任务上本章设置秩的值为4。
+表~\ref{tab:c5_all_pet} 中的实验结果显示与本章提出的MixPHM相比，虽然LoRA和BitFit引入的可训练参数相对更加轻量，但MixPHM的性能远优于LoRA和BitFit。
+尤其是随着训练样本数$N_{\mathcal{D}}$的增加，MixPHM与LoRA和BitFit的性能差距进一步拉大。
+其可能的解释如Compacter一样，太少的可训练参数量可能无法拟合复杂的任务数据。
+
+
+
+\subsubsection{与最先进的多模态少样本学习方法的性能对比}
+少样本视觉问答（Few-Shot VQA）是低资源视觉问答任务的一种特殊案例。
+表~\ref{tab:c5_vqa_few_shot}展示了本章所提MixPHM与最先进多模态少样本学习器的性能比较。
+其中，Frozen~\cite{tsimpoukelli2021multimodal} 和 PICa~\cite{yang2022empirical}是两种基于上下文学习的方法，它们使用提示学习~\cite{lester2021power}来迁移大规模语言模型（如GPT-2和GPT-3~\cite{brown2020language}）的少样本学习能力而无需调整预训练模型本身的参数。
+而FewVLM~\cite{jin2022good}是一种基于提示的全模型参数调节方法，用于将预训练的VL-T5迁移到下游任务。
+它将人为设计的提示插入到模型输入中，并调节全部的模型参数。
+为了进行有效对比，本章使用MixPHM以参数有效的方式将FewVLM迁移到下游少样本视觉问答任务中。
+实验结果表明仅调整了少量参数，MixPHM在少样本上的性能就已经优于FewVLM。
+特别是在OK-VQA数据上，MixPHM的性能较FewVLM提高了\textbf{4.2}。
+这证明了MixPHM在性能和参数有效性方面的优越性。
+
+\input{table/c5_abl_ra.tex}
+
+% **************************************************************************
+\xsubsection{消融实验}{Ablation Study}
+
+设置训练样本个数$N_{\mathcal{D}}$为64，本章使用VL-T5~\cite{cho2021unifying}为基线预训练视觉语言模型在VQA v2、GQA 和 OK-VQA 三个数据集上进行了消融实验。
+
+
+\subsubsection{冗余正则$\mathcal{L}_{\text{Ra}}$的有效性分析}
+在MixPHM中，冗余正则$\mathcal{L}_{\text{Ra}}$的作用是在减少对视觉语言预训练模型中冗余信息利用的同时促进模型学习更加任务相关的表征。
+为了验证本章提出的$\mathcal{L}_{\text{Ra}}$ 的有效性，本章首先实现一个一致性正则$\mathcal{L}_{\text{cs}}$~\cite{zuo2022taming} 进行对比。
+此外，为了分析冗余正则$\mathcal{L}_{\text{Ra}}$ 中各项的贡献，本章考虑以下两种变体：
+(\emph{i}) ${\mathcal{L}^{\text{I}}_{\text{Ra}}}$：在训练过程中，仅使用公式(\ref{eq:L_Ra}) 中的第一项作为正则损失训练MixPHM。
+(\emph{ii}) ${\mathcal{L}^{\text{II}}_{\text{Ra}}}$：在训练过程中，仅使用公式(\ref{eq:L_Ra}) 中的第二项作为正则损失训练MixPHM。
+除了精度外，表~\ref{tab:c5_abl_ra}还展示了上述方法的训练速度，即模型每次参数更新的平均用时。
+从表中的实验结果中本章发现一致性正则损失仅在GQA数据集上对MixPHM性能有改善并且性能提升幅度较小。
+
+与之相比，本章提出的冗余正则损失$\mathcal{L}_{\text{Ra}}$以及$\mathcal{L}_{\text{Ra}}$的第二项${\mathcal{L}^{\text{II}}_{\text{Ra}}}$在所有实验数据集上都对MixPHM性能有较大提升。
+这些实验结果均表明冗余正则对MixPHM的有效性。
+此外，比较${\mathcal{L}^{\text{I}}_{\text{Ra}}}$和${\mathcal{L}^{\text{II}}_{\text{Ra}}}$对模型性能的影响，本章发现单纯地减少MixPHM生成表征与视觉语言预训练模型输出表征间的信息冗余（即，(\emph{i}) ${\mathcal{L}^{\text{I}}_{\text{Ra}}}$）对提升MixPHM性能的贡献很有限，在VQA v2数据集上甚至表现出了性能负增长，但${\mathcal{L}^{\text{I}}_{\text{Ra}}}$和${\mathcal{L}^{\text{II}}_{\text{Ra}}}$共同作用效果优于单独使用${\mathcal{L}^{\text{II}}_{\text{Ra}}}$。
+这一实验结果表明减少表征冗余和促进表征任务相关二者之间的平衡对MixPHM的重要性。
+
+
+\input{table/c5_param_redundancy.tex}
+\input{table/c5_abl_routing.tex}
+
+\subsubsection{减少参数冗余的影响}
+为减少参数冗余，MixPHM先使用PHM分解专家权重（D1），然后再重新参数化分解后的权重（D2）。
+本章对D1和D2进行了消融以分析它们对MixPHM性能的影响。
+此外，权重共享可以进一步减少MixPHM中的参数冗余。
+因此，本章对不同的共享权重方式也进行了消融分析。
+除了全局共享矩阵（$\Smat$）外，本章还在MixPHM中的专家之间共享下投影（$\Amat^{\text{dn}}$）或上投影（$\Amat^{\text{up}}$）矩阵。
+表\ref{tab:c5_abl_param_redundancy}中的实验结果显示了在参数效率和性能之间存在权衡，即过度的参数削减可能会损害性能。
+因此，本章提倡在减少参数冗余的同时保持模型容量。
+
+
+\subsubsection{不同路由机制的有效性分析}
+在MixPHM中，路由机制除了影响模型的精度，还影响模型训练的速度。
+为了比较不同路由策略的性能和速度，本章首先实现了两种随机路由方法，即分词级别的随机路由和句子级别的随机路由~\cite{fedus2021switch}，来为MixPHM进行专家选择。
+此外，本章提出了一种简单的基于表征聚合的路由策略（MixPHM-Rep），即将MixPHM中所有PHM专家的输出求平均作为MixPHM最终的输出。
+本章在五个不同的随机种子下重复实验，其性能均值和方差以及训练时每次迭代的平均时间如表~\ref{tab:c5_abl_routing}所示。
+实验结果显示基于专家权重平均的路由策略训练速度最快且在VQA v2和OK-VQA两个数据集上性能最优。
+
+
+
+% *******************************************************
+\begin{figure}[!t]
+\begin{subfigure}[b]{.48\linewidth}
+\centering
+\includegraphics[width=0.89\linewidth,height=0.7\linewidth]{figure/c5_mixphm_rsa_f1.pdf}
+\subcaption{$\hv_a$ 和 $\hv$表征空间RSA相似性}
+\end{subfigure}%
+\hfill
+\begin{subfigure}[b]{.48\linewidth}
+\centering
+\includegraphics[width=.89\linewidth,height=0.7\linewidth]{figure/c5_mixphm_rsa_f2.pdf}
+\subcaption{$\hv_a$ 和 $\tilde{\hv}$表征空间RSA相似性}
+\end{subfigure}
+\caption{Adapter相关表征空间的RSA相似性
+}
+\label{fig:mixphm_rsa}
+\end{figure}
+% *******************************************************
+
+\subsubsection{MixPHM中的冗余分析}
+本章中，本章提出通过减少任务无关的表征冗余并促进任务相关的表征关联来提高Adapter的有效性，进而提出本章的参数有效微调方法MixPHM。
+为了评估MixPHM是否是基于这一假设导致的性能提升，本章在与第~\ref{sec:revist}节中描述的相同实验设置下对MixPHM进行了冗余性分析。
+图~\ref{fig:mixphm_rsa}展示了在VQA v2上的1000个样本中的RSA相似性。
+与Adapter的表征冗余分析相比，本章观察到MixPHM显著降低了$\hv_a$和$\hv$之间的表征冗余，同时增加了$\hv_a$和$\tilde{\hv}$之间的表征相关。
+这一发现为本章的方法动机的合理性和方法的有效性均提供了有效的证明。
+
+
+
+
+\subsubsection{MixPHM在其他预训练视觉语言模型上的泛化能力}
+为了验证本章方法在其他预训练视觉语言模型上的泛化能力，本章使用MixPHM将预训练的X-VLM~\cite{zeng2022multi}、BLIP~\cite{li2022blip}和OFA$_{\text{Base}}$~\cite{wang2022ofa}迁移到低资源视觉问答任务。
+表~\ref{tab:c5_generalization}展示了MixPHM和全模型微调方法在VQA v2数据集上的性能比较。
+本章观察到，在所有低资源设置下，MixPHM的性能始终优于全模型微调，当$N_{\mathcal{D}}$ $\in$ $\{500,1000\}$时，性能增益最显著。
+值得注意的是，最大的性能增益来自于$N_{\mathcal{D}}$=1000，$N_{\mathcal{D}}$=500和$N_{\mathcal{D}}$=1000时的X-VLM（\textbf{+4.14}），BLIP（\textbf{+4.80}）和OFA$_{\text{Base}}$（\textbf{+3.20}）。
+这些发现表明了MixPHM对各种预训练视觉语言模型的泛化能力。
+
+
+\input{table/c5_diss_generalization.tex}
+
+\input{table/c5_abl_param_all.tex}
+
+
+\subsubsection{PHM专家数量$N_e$对MixPHM性能的影响}
+为了分析PHM专家数量$N_e$对MixPHM性能的影响，本章在$N_e \in \{1, 2, 4, 8, 12\}$时进行消融实验。
+表~\ref{tab:c5_abl_hp} (I) 中的实验结果表明增加PHM专家的数量并不能带来持续的性能提升。
+在PHM专家数量$N_e$为4、2和8时，MixPHM分别在VQA v2、GQA和OK-VQA上取得最佳性能。
+在GQA数据集上不论PHM专家数量$N_e$如何变化，MixPHM的性能始终显著优于全模型微调。
+在VQA v2数据集上，除了$N_e=1$时，MixPHM性能都超过了全模型微调的水平。
+在OK-VQA数据集上，除了$N_e\in \{1, 2\}$时，MixPHM性能都超过了全模型微调的水平。
+
+
+\subsubsection{PHM专家下采样投影表征维度$d_r$对MixPHM性能的影响}
+为了分析PHM专家下采样投影时瓶颈表征维度$d_r$对MixPHM性能的影响，本章在$d_r \in \{48, 64, 96, 192, 384\}$的设置下进行消融实验。
+表~\ref{tab:c5_abl_hp} (II) 中的实验结果表明MixPHM性能并不显著依赖参数$d_r$。
+具体来说，
+在瓶颈表征维度$d_r$为48、64和64时，MixPHM分别在VQA v2、GQA和OK-VQA上取得最佳性能。
+此外，在VQA v2和GQA数据集上不论瓶颈表征维度$d_r$如何变化，MixPHM的性能始终显著优于全模型微调的方法且性能随$d_r$变化的波动较小。
+在OK-VQA数据集上，MixPHM的性能在$d_r \in \{64, 96, 192\}$时优于全模型微调。
+
+\subsubsection{PHM专家权重矩阵秩$d_k$对MixPHM性能的影响}
+为了分析PHM专家权重矩阵的秩$d_k$对MixPHM性能的影响，本章变化$d_k$的取值进行消融实验。
+表~\ref{tab:c5_abl_hp} (III) 中展示了在$d_k \in \{1, 8, 16, 24\}$ 的设置下MixPHM的实验结果。
+该结果表明MixPHM性能并不显著依赖参数$d_k$。
+具体来说，在PHM专家权重矩阵的秩$d_k$为16、8和24时，MixPHM分别在VQA v2、GQA和OK-VQA上取得最佳性能。
+在VQA v2和GQA数据集上不论HM专家权重矩阵的秩$d_k$如何变化，MixPHM的性能始终显著优于全模型微调的方法且性能随$d_k$变化的波动较小。
+在OK-VQA数据集上，除了$d_k =1$时，MixPHM的性能始终优于全模型微调。
+
+
+\subsubsection{超参数$n$对MixPHM性能的影响}
+在MixPHM中，超参数$n$用于确定将PHM专家权重矩阵分解成低秩矩阵的个数。
+为了分析超参数$n$对MixPHM性能的影响，本章变化$n$的取值进行消融实验。
+表~\ref{tab:c5_abl_hp} (IV) 中展示了在$n \in \{2, 4, 8, 16\}$ 的设置下MixPHM的实验结果。
+具体来说，在超参$n$为4时，MixPHM分别在VQA v2、GQA和OK-VQA上取得最佳性能。
+在GQA数据集上不论$n$如何变化，MixPHM的性能始终显著优于全模型微调且性能随$n$变化的波动较小。
+在VQA v2数据集上，当$n \in \{2, 4, 8\}$时，不论$n$如何变化，MixPHM的性能始终显著优于全模型微调的方法且性能随$n$变化的波动较小。
+在OK-VQA数据集上，当$n \in \{2, 4\}$时，MixPHM的性能优于全模型微调。
+% 该结果表明本章提出的MixPHM对超参$n$鲁棒。
+% 即简单的改变超参$n$的数值，MixPHM的性能波动很小，且仍能优于全模型微调方法的性能。
+
+
+% ********************************************************************
+\begin{figure}[!t]
+\begin{subfigure}[b]{0.328\linewidth}
+\centering
+\includegraphics[width=.935\linewidth,height=.75\linewidth]{figure/c5_aplha_vqav2.pdf}
+\subcaption{VQA v2}
+\label{fig:c5_abl_hp_alpha_vqav2}
+\end{subfigure}
+\begin{subfigure}[b]{0.328\linewidth}
+\centering
+\includegraphics[width=.935\linewidth,height=.75\linewidth]{figure/c5_aplha_gqa.pdf}
+\subcaption{GQA}
+\label{fig:c5_abl_hp_alpha_gqa}
+\end{subfigure}
+\begin{subfigure}[b]{0.328\linewidth}
+\centering
+\includegraphics[width=.935\linewidth,height=.75\linewidth]{figure/c5_aplha_okvqa.pdf}
+\subcaption{OK-VQA}
+\label{fig:c5_abl_hp_alpha_okvqa}
+\end{subfigure}
+\caption{训练样本数$N_{\mathcal{D}}=64$时在数据集VQA v2、GQA和OK-VQA上MixPHM性能随不同$\alpha$值的变化
+}
+\label{fig:c5_abl_hp_alpha}
+\end{figure}
+% ********************************************************************
+
+
+\subsubsection{超参数$\alpha$对MixPHM性能的影响}
+参数$\alpha$用于确定训练目标中冗余正则所占的比重。
+为了分析超参数$\alpha$对MixPHM性能的影响，本章对不同的$\alpha$值进行实验。
+训练样本数$N_{\mathcal{D}}=64$时，
+在数据集VQA v2、GQA和OK-VQA上的实验结果分别如图~\ref{fig:c5_abl_hp_alpha_vqav2}、图~\ref{fig:c5_abl_hp_alpha_gqa}和图~\ref{fig:c5_abl_hp_alpha_okvqa}所示。
+具体来说，在$\alpha$为0.08、0.2和0.01时，MixPHM分别在VQA v2、GQA和OK-VQA上取得最佳性能。
+在GQA数据集上，MixPHM性能随$\alpha$值的变化波动最大，但性能始终显著优于全模型微调的方法。
+此外，在VQA v2和GQA数据集上，随$\alpha$值的变化，MixPHM的性能也基本保持优于全模型微调。
+
+
+
+% ********************************************************************
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=1.0\linewidth]{figure/c5_vis.pdf}
+\caption{在VQA v2验证集上视觉问答的可视化举例}
+\label{fig:c5_vis_attn}
+\end{figure*}
+% ********************************************************************
+
+
+% ********************************************************************
+\xsubsection{定性实验}{Qualitative Experiment}
+
+如图~\ref{fig:c5_vis_attn}所示，本章可视化了一些视觉问答的例子。
+其中的答案是利用在VQA v2数据集上使用MixPHM对VL-T5进行微调后生成的。
+此外，本章可视化了图像的自顶向下注意力~\cite{anderson2018bottom}，并标记了问题中前两个与任务相关的token。
+具体来说，本章遵循最近的一项工作~\cite{jiang2022finetuning}，计算任务相关表征与通过Anderson等人的工作~\cite{anderson2018bottom}获得的视觉输入特征之间的注意力得分，并可视化前两个得分最高的自顶向下的注意力。
+类似地，本章计算任务相关表征与问题的语言嵌入之间的得分，并标记前两个得分最高的Token。
+图~\ref{fig:c5_vis_attn}的结果定性地证明了本章提出的MixPHM可以生成更一致和与问题更相关的视觉和文本注意力。
+
+
+
+% **************************************************************************
+\xsection{本章小结}{Summary}
+
+本章提出了一种全新的冗余感知参数有效微调方法。
+该方法利用PHM在低秩空间学习专家的权重矩阵，并使用不需要额外训练参数的专家权重平均路由机制，在将预训练视觉语言模型迁移到低资源视觉问答任务时极大地提高了模型的参数有效性。
+此外，MixPHM通过引入冗余正则化来降低表征中与任务无关的冗余并提高与任务相关信息相关性。
+在三个视觉问答数据集不同低资源设置下进行了广泛的实验一致证明了本章提出的方法在性能和参数效率层面的有效性及优越性。
+在未来，我们的目标是探索新的参数有效迁移方法，该方法能显式地减少与任务无关的冗余并充分利用与任务相关的冗余来提高模型的泛化能力。
+

@@ -1,0 +1,58 @@
+\begin{table}[!t]
+\caption{
+与多模态少样本学习方法的性能对比 
+% FewVLM是基于提示学习的全模型微调方法，MixPHM$^{\dagger}$表示使用MixPHM以参数有效的方式调节FewVLM模型。
+}
+\label{tab:c5_vqa_few_shot}
+\setlength{\tabcolsep}{6.75mm}{
+\begin{tabularx}{\linewidth}{@{}lccccc@{}}
+\toprule
+\multirow{1}{*}{Method} 
+&Model Size 
+&\#Param (\%)
+&\multirow{1}{*}{VQAv2}
+&\multirow{1}{*}{GQA} 
+&\multirow{1}{*}{OK-VQA} 
+\\
+
+\midrule
+
+Frozen~\cite{tsimpoukelli2021multimodal} 
+&7B
+&-
+&38.2 &12.6 & -  
+\\ 
+
+PICa-Base~\cite{yang2022empirical} 
+&175B 
+&-
+&\text{54.3} &\text{43.3} &- 
+\\
+
+PICa-Full~\cite{yang2022empirical} 
+&175B 
+&-
+&\textbf{56.1} &\textbf{48.0} &- 
+\\
+% $_{base}$
+FewVLM~\cite{jin2022good}  
+&225M  
+&100\% 
+&48.2 
+&32.2 
+&15.0 
+\\ 
+
+MixPHM$^{\dagger}$
+&226M
+&0.39\%
+&49.3
+&33.4
+&\textbf{19.2}
+\\ 
+
+
+\bottomrule
+\end{tabularx}
+}
+\end{table}

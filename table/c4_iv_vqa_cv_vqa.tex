@@ -1,0 +1,195 @@
+\begin{table}[!t]
+\centering
+\caption{在IV-VQA 和 CV-VQA数据集上的性能(\%)比较
+}
+\label{tab:c4_iv_cv_vqa}
+\setlength{\tabcolsep}{1.62mm}{
+\begin{tabularx}{\linewidth}{@{}lllllll@{}}
+\toprule
+
+\multirow{2}{*}{Method}
+&\multicolumn{3}{c}{IV-VQA} 
+&\multicolumn{3}{c}{CV-VQA} 
+\\
+
+\cmidrule(r){2-4} \cmidrule(l){5-7}
+
+&PER $\uparrow$
+&ORI $\uparrow$
+&\#flips $\downarrow$
+
+&PER $\uparrow$
+&ORI $\uparrow$
+&\#flips $\downarrow$
+\\ 
+\midrule[1pt]
+
+CL~\citep{Lu2015} 
+&- &60.21 &17.89 
+&- &39.38 &81.41 
+\\ 
+
+SNMN~\citep{hu2018explainable} 
+&- &66.04 &6.52 
+&- &47.95 &78.92 
+\\ 
+
+SAAA~\citep{kazemi2017show}% 
+&- &70.26 &7.85 
+&- &49.90 &78.44 
+\\ 
+
+UNITER$_\text{B}$~\citep{chen2020uniter}
+&- &- &8.47
+&- &- &40.67 
+\\
+\quad MANGO$_\text{B}$~\citep{li2020closer} 
+&- &- &7.32 \positive{\uparrow 1.15}
+&- &- &38.11 \positive{\uparrow 2.56}
+\\ 
+
+VILLA$_{\text{B}}$~\citep{gan2020large}
+&- &- &7.07
+&- &- &38.28
+\\
+\quad MANGO$_{\text{VB}}$~\citep{li2020closer} 
+&- &- &7.43 \positive{\uparrow 0.36}
+&- &- &38.25 \textcolor{red}{$\downarrow$ 0.03}
+\\
+
+% =========================================================================
+\midrule
+VisualBERT~\citep{li2019visualbert}\textcolor{red}{$^\dagger$}
+&46.04 &81.99 &26.84  
+&30.48 &76.30 &30.13
+\\
+\quad + Our CIB 
+&47.81 \positive{\uparrow 1.77} 
+&83.48 \positive{\uparrow 1.49} 
+&23.91 \positive{\uparrow 2.93}
+&32.46 \positive{\uparrow 1.98} 
+&77.09 \positive{\uparrow 0.79} 
+&27.98 \positive{\uparrow 2.15}
+\\ 
+
+ViLBERT~\citep{lu2019vilbert}\textcolor{red}{$^\dagger$} 
+&72.37 &81.73 &11.98
+&32.24 &70.70 &35.43
+\\
+\quad + Our CIB
+&74.67 \positive{\uparrow 2.30} 
+&83.35 \positive{\uparrow 1.62} 
+&10.85 \positive{\uparrow 1.13}
+&35.33 \positive{\uparrow 3.09} 
+&71.11 \positive{\uparrow 0.41} 
+&34.01 \positive{\uparrow 1.42}
+\\ 
+
+VL-BERT$_\text{B}$~\citep{su2019vl}\textcolor{red}{$^\dagger$}
+&72.42 &82.35 &12.58
+&33.52 &71.00 &34.28
+\\
+\quad + Our CIB
+&73.66 \positive{\uparrow 1.24} 
+&83.37 \positive{\uparrow 1.02} 
+&11.00 \positive{\uparrow 1.58}
+&35.29 \positive{\uparrow 1.77} 
+&72.70 \positive{\uparrow 1.70} 
+&32.09 \positive{\uparrow 2.19}
+\\
+
+VL-T5~\citep{cho2021unifying}\textcolor{red}{$^\dagger$}
+&75.73 
+&-%84.86 
+&9.76
+&35.09 
+&-%77.66 
+&33.43
+\\
+\quad + Our CIB
+&76.46 \positive{\uparrow 0.73} 
+&-%86.10 \positive{\uparrow 1.24})
+&8.55 \positive{\uparrow 1.21}
+&42.55 \positive{\uparrow 7.46}
+&-%79.89 \positive{\uparrow 2.23}) 
+&30.42 \positive{\uparrow 3.01}
+\\
+
+LXMERT~\citep{tan2019lxmert}\textcolor{red}{$^\dagger$} 
+&77.83 
+&-%92.07 
+&12.67
+&38.86 
+&-%88.87 
+&32.80
+\\
+\quad + Our CIB 
+&78.57 \positive{\uparrow 0.74}
+&-%94.15 \positive{\uparrow 2.08})
+&11.64 \positive{\uparrow 1.03}
+&40.47 \positive{\uparrow 1.61}
+&-%93.90 \positive{\uparrow 5.03}) 
+&30.37 \positive{\uparrow 2.43}
+\\ 
+
+UNITER$_\text{B}$~\citep{chen2020uniter}\textcolor{red}{$^\dagger$}
+&75.71 &84.56 &11.77
+&42.60 &78.27 &29.67
+\\
+\quad + Our CIB 
+&76.63 \positive{\uparrow 0.92} 
+&86.05 \positive{\uparrow 1.49} 
+& 9.80 \positive{\uparrow 1.97}
+&46.92 \positive{\uparrow 4.32} 
+&79.89 \positive{\uparrow 1.62} 
+&27.99 \positive{\uparrow 1.68} 
+\\ 
+
+ALBEF~\citep{li2021align}\textcolor{red}{$^\dagger$}
+&85.63 &87.87 &12.00
+&50.00 &80.00 &28.71
+\\
+\quad + Our CIB
+&87.21 \positive{\uparrow 1.58} 
+&88.88 \positive{\uparrow 1.01} 
+&~~9.16 \positive{\uparrow 2.84}
+&51.78 \positive{\uparrow 1.78} 
+&81.45 \positive{\uparrow 1.45} 
+&25.76 \positive{\uparrow 2.95}
+\\
+% {mPLUG$_{\text{B}}$} \cite{li2022mplug}\textcolor{red}{$^\dagger$}
+% &{86.96}
+% &{89.40}
+% &{13.16}
+% &{53.92}
+% &{78.49}
+% &{25.50}
+% \\
+% \quad {+ CIB}
+% &{88.47 \positive{\uparrow 1.51}} 
+% &{90.33 \positive{\uparrow 0.93}} 
+% &{10.59 \positive{\uparrow 2.57}} 
+% &{55.20 \positive{\uparrow 1.28}} 
+% &{79.43 \positive{\uparrow 0.94}} 
+% &{24.07 \positive{\uparrow 1.43}} 
+% \\
+% {BEiT-3$_{\text{B}}$} \cite{wang2022image}\textcolor{red}{$^\dagger$}
+% &{87.96}
+% &{89.38}
+% &{~~9.08}
+% &{55.17}
+% &{79.99}
+% &{24.08}
+% \\
+% \quad {+ CIB}
+% &{\textbf{90.00} \positive{\uparrow 2.04}} 
+% &{90.64 \positive{\uparrow 1.26}} 
+% &{~~\textbf{5.40} \positive{\uparrow 3.68}} 
+% &{\textbf{57.95} \positive{\uparrow 2.78}} 
+% &{81.00 \positive{\uparrow 1.01}} 
+% &{\textbf{23.23} \positive{\uparrow 0.85}} 
+% \\ 
+\bottomrule
+\end{tabularx}
+}
+\end{table}

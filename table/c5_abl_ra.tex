@@ -1,0 +1,58 @@
+\begin{table}[!t]
+\caption{训练样本数$N_{\mathcal{D}}=64$时不同正则的性能比较 
+% ${\mathcal{L}_{\text{cs}}}$是由 Zuo~等人~\cite{zuo2022taming}提出的一种一致性正则。 
+% ${\mathcal{L}^{\text{I}}_{\text{Ra}}}$ 和 ${\mathcal{L}^{\text{II}}_{\text{Ra}}}$ 分别表示本章提出的冗余正则$\mathcal{L}_{\text{Ra}}$的第一和第二项。
+}
+\label{tab:c5_abl_ra}
+\setlength{\tabcolsep}{10.32mm}{
+\begin{tabularx}{\linewidth}{lccc}
+\toprule
+\multirow{1}{*}{Method} 
+&\multicolumn{1}{c}{VQA v2 val}
+&\multicolumn{1}{c}{GQA test-dev}
+&\multicolumn{1}{c}{OK-VQA test}
+\\ 
+\midrule
+
+\rowcolor{gray!20}
+Finetuning
+&46.87$~\std{0.57}$
+&34.22$~\std{0.59}$
+&16.65$~\std{1.02}$
+\\
+
+MixPHM$^*$
+&47.30$~\std{0.67}$ 
+&34.66$~\std{0.78}$ 
+&18.05$~\std{1.16}$ 
+\\ 
+
+\quad + ${\mathcal{L}_{\text{cs}}}$
+&46.70$~\std{0.66}$ 
+&34.83$~\std{1.35}$ 
+&17.37$~\std{1.38}$ 
+\\
+
+\quad + ${\mathcal{L}^{\text{I}}_{\text{Ra}}}$
+&47.42$~\std{0.71}$ 
+&34.69$~\std{0.96}$ 
+&18.25$~\std{1.54}$ 
+\\
+
+\quad + ${\mathcal{L}^{\text{II}}_{\text{Ra}}}$
+&47.71$~\std{0.85}$ 
+&36.10$~\std{0.83}$ 
+&18.21$~\std{1.08}$
+\\
+
+\rowcolor{DeepSkyBlue!20}
+\quad + $\mathcal{L}_{\text{Ra}}$
+&\textbf{47.65$~_{\pm{0.56}}$}
+&\textbf{36.75$~_{\pm{0.55}}$}
+&\textbf{17.02$~_{\pm{1.70}}$}
+\\ 
+
+\bottomrule
+\end{tabularx}
+}
+\end{table}

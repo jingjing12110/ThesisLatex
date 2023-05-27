@@ -1,0 +1,71 @@
+\begin{table}[!t]
+\caption{在GQA-OOD数据集上的性能比较
+% \textcolor{blue}{$\uparrow$} (\textcolor{red}{$\downarrow$}) 表示值越高（低）越好。
+}
+\label{tab:c3_gqa_ood}
+\setlength{\tabcolsep}{10.8mm}{
+\begin{tabularx}{\textwidth}{@{}lcccc@{}}
+\toprule
+\multirow{2}{*}{Method}
+&\multicolumn{4}{c}{Metrics (\%)} 
+\\
+
+\cmidrule(l){2-5}
+
+&All \textcolor{blue}{$\uparrow$}
+&\text{Tail} \textcolor{blue}{$\uparrow$}
+&Head \textcolor{blue}{$\uparrow$}
+&$\Delta$ \textcolor{red}{$\downarrow$} 
+\\ 
+\midrule
+\multicolumn{5}{c}{\textbf{Plain Model}} 
+\\
+% 结果来自于GQA-OOD benchmark 提出的文章
+BAN4~\cite{kim2018bilinear} &50.20 
+&{47.20} &51.90 &9.90 \\ 
+% meta module network
+MMN~\cite{chen2021meta} &52.70 
+&{48.00} &55.50 &15.60 \\ 
+UpDn~\cite{anderson2018bottom} &46.40 
+&{42.10} &49.10 &16.60 \\
+\, + LMH~\cite{clark2019don} &33.10 
+&{30.80} &34.50 &12.00 \\
+\, + LM~\cite{clark2019don} &34.50 
+&{32.20} &35.90 &11.50 \\ 
+
+\, + RUBi~\cite{cadene2019rubi} &38.80 
+&{35.70} &40.80 &14.30 \\
+
+\, \textbf{+ X-GGM} &48.41 
+&{45.99} &{49.90} &\textbf{8.51} 
+\\
+
+\midrule
+
+\multicolumn{5}{c}{\textbf{Transformer-based Model}} 
+\\
+MCAN~\cite{yu2019deep} &50.80 
+&{46.50} &53.40 &14.80 
+\\  % transformer 
+MANGO (UNITER)~\cite{li2020closer} &\textbf{56.40} 
+&51.27 &\textbf{59.55} &16.15 
+\\ 
+LXMERT~\cite{tan2019lxmert}
+&54.60 &{49.80} &\text{57.70} &15.90 
+\\ 
+\, + VILLA$^{*}$~\cite{gan2020large} 
+&54.47 
+&{49.95} &57.24 &14.59 
+\\
+\, + MANGO~\cite{li2020closer} 
+&54.94 &{--} &-- &-- 
+\\
+
+\, \textbf{+ X-GGM} 
+&\text{55.59} 
+&{\textbf{52.47}} &57.51 &\text{9.59} 
+\\ 
+\bottomrule
+\end{tabularx}    
+}
+\end{table}

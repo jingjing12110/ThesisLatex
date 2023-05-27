@@ -1,0 +1,30 @@
+\begin{table}[!t]
+\caption{RefCOCO+~\citep{yu2016modeling}数据集上弱监督视觉定位的实验结果
+}
+\label{tab:c4_vg}
+\setlength{\tabcolsep}{18.35mm}{
+\begin{tabularx}{\linewidth}{@{}lccc@{}}
+\toprule
+Method &Val &TestA &TestB
+\\
+% \cmidrule(l){2-4}
+\midrule[1pt]
+ARN~\citep{liu2019adaptive} 
+&32.78 &34.35 &32.13
+\\
+CCL~\citep{zhang2020counterfactual}
+&34.29 &36.91 &33.56
+\\
+ALBEF$_{\text{itc}}$~\citep{li2021align}
+&51.58 &60.09 &40.19
+\\
+ALBEF$_{\text{itm}}$~\citep{li2021align}
+&58.46 &65.89 &46.25
+\\
+\quad + Our CIB
+&\textbf{59.41} &\textbf{67.39} &\textbf{47.18}
+\\
+\bottomrule 
+\end{tabularx}
+}
+\end{table}

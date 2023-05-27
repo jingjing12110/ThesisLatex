@@ -1,0 +1,54 @@
+\begin{table}[!t]
+\caption{在VQA v2 test-dev上的实验结果 
+% $^{\dagger}$表示该结果是我们对基线视觉语言预训练模型重新实现的结果。
+}
+\label{tab:c4_comp_vqa_v2_all} 
+\setlength{\tabcolsep}{18.9mm}{
+\begin{tabularx}{\linewidth}{@{}lrr}
+\toprule
+\multirow{2}{*}{VLMs} 
+&\multicolumn{2}{c}{VQA-Score}
+\\
+\cmidrule(l){2-3}
+&Baseline &+ CIB  
+\\ 
+\midrule[1pt] 
+VisualBERT~\citep{li2019visualbert} 
+&70.80 (70.46\textcolor{red}{$^{\dagger}$}) 
+&\cellcolor{gray!15}71.62 \positive{\uparrow 1.16}
+\\ 
+
+VL-T5~\citep{cho2021unifying}
+&- (70.23\textcolor{red}{$^{\dagger}$}) 
+&71.14\cellcolor{gray!15} \positive{\uparrow 0.91} 
+\\
+
+LXMERT~\citep{tan2019lxmert} 
+&72.42 (72.58\textcolor{red}{$^{\dagger}$})
+&\cellcolor{gray!15}72.99 \positive{\uparrow 0.41}
+\\ 
+
+UNITER$_{\text{B}}$~\citep{chen2020uniter} 
+&72.70 (71.63\textcolor{red}{$^{\dagger}$})
+&\cellcolor{gray!15}72.11 \positive{\uparrow 0.48} 
+\\ 
+
+ALBEF~\citep{li2021align}
+&74.54 (74.54\textcolor{red}{$^{\dagger}$}) 
+&76.27\cellcolor{gray!15} \positive{\uparrow 1.73} 
+\\
+
+ViLBERT~\citep{lu2019vilbert} 
+&70.55 (70.55\textcolor{red}{$^{\dagger}$}) 
+&\cellcolor{gray!15}71.00 \positive{\uparrow 0.45}
+\\ 
+
+VL-BERT$_{\text{B}}$~\citep{su2019vl} 
+&71.16 (71.20\textcolor{red}{$^{\dagger}$}) 
+&\cellcolor{gray!15}71.59 \positive{\uparrow 0.39} 
+\\ 
+
+\bottomrule 
+\end{tabularx}
+}
+\end{table}

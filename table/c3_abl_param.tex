@@ -1,0 +1,59 @@
+\begin{table}[!t]
+\caption{X-GGM使用具有$N_l$层不同的图编码器的性能对比}
+\label{tab:c3_abl_GEnc}
+\setlength{\tabcolsep}{4.98mm}{
+\begin{tabularx}{\textwidth}{cccccccc}
+\toprule
+\multirow{2}{*}{Graph Encoder}
+&\multirow{2}{*}{$N_l$}
+&\multicolumn{3}{c}{VQA-CP v2 ``Other'' (\%)} 
+&\multicolumn{3}{c}{GQA-OOD (\%)} 
+\\
+\cmidrule(lr){3-5}
+\cmidrule(l){6-8}
+& 
+&\small OOD\textcolor{blue}{$\uparrow$}
+&\small ID\textcolor{blue}{$\uparrow$}
+&\small Gap\textcolor{red}{$\downarrow$} 
+&\small Tail\textcolor{blue}{$\uparrow$} 
+&\small Head\textcolor{blue}{$\uparrow$} 
+&$\Delta$\textcolor{red}{$\downarrow$} 
+\\
+\midrule
+\rowcolor{gray!15}LXMERT &--- 
+&59.98 &65.21 &5.23 
+&49.80 &57.70 &15.90 
+\\
+% \hline
+\multirow{2}{*}{GCN} &1 
+&64.10 &66.70 &2.60
+&51.65 &57.24 &10.83 
+\\
+~&2 
+&\textbf{64.33} &\textbf{66.92} &2.59 
+&\textbf{52.47} &{57.51} &\textbf{9.59} 
+\\
+
+\multirow{2}{*}{GIN} &1 
+&63.62 &66.24 &2.62 
+% &50.42 &54.58 &13.29 \\
+&50.99 &57.08 &11.93 
+\\
+~&2 
+&63.83 &66.39 &2.56 
+&51.27 &57.30 &11.76 
+\\
+
+\multirow{2}{*}{GAT} &1 
+&63.94 &66.40 &\textbf{2.46} 
+&51.65 &\textbf{57.71} &11.73 
+\\
+~&2 
+&63.94 &66.45 &2.51 
+&50.99 &56.90 &11.59
+% &50.71 &54.65 &12.56 
+\\
+\bottomrule
+\end{tabularx}
+} % scale box
+\end{table}

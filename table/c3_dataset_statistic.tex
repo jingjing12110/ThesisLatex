@@ -1,0 +1,43 @@
+\begin{table}[!t]
+\caption{数据集的统计信息}
+\label{tab:c3_dataset}
+\setlength{\tabcolsep}{0.7mm}{
+\begin{tabularx}{\textwidth}{@{}lcccccccccc@{}}
+\toprule
+\multirow{2}{*}{Dataset}  
+&\multicolumn{5}{c}{Image} 
+&\multicolumn{5}{c}{Question} 
+% &\multirow{2}{*}{Year} 
+\\
+
+\cmidrule(lr){2-6}
+\cmidrule(l){7-11}
+&Train &Val &OOD &ID &Total
+&Train &Val &OOD &ID &Total
+% & 
+\\ 
+\midrule
+
+VQA-CP v2~\cite{agrawal2018don}
+& \eqmakebox[log][r]{119,107} & \eqmakebox[log][r]{31,976} 
+& \eqmakebox[log][r]{89,437} & \eqmakebox[log][r]{32,266} 
+& \eqmakebox[log][r]{272,786} 
+& \eqmakebox[log][r]{388,735} & \eqmakebox[log][r]{38,802}
+& \eqmakebox[log][r]{179,928} & \eqmakebox[log][r]{40,000} 
+& \eqmakebox[log][r]{647,465} 
+% &2018 
+\\
+
+GQA-OOD~\cite{kervadec2021roses} 
+& \eqmakebox[log][r]{72,140} & \eqmakebox[log][r]{9,406} 
+& \eqmakebox[log][r]{330} & \eqmakebox[log][r]{365} 
+& \eqmakebox[log][r]{82,241} 
+& \eqmakebox[log][r]{943,000} & \eqmakebox[log][r]{51,045} 
+& \eqmakebox[log][r]{1,063} & \eqmakebox[log][r]{1,733} 
+& \eqmakebox[log][r]{996,841} 
+% &2020 
+\\ 
+\bottomrule
+\end{tabularx}
+}
+\end{table}

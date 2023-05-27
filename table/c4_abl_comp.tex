@@ -1,0 +1,180 @@
+% **********************************************************************
+% motivation 
+\begin{table}[!t]
+\caption{CIB中不同项组合与不同互信息估计器的消融实验结果 (\%) 
+% \ding{202}--\ding{205}表示公式~(\ref{eq:c4_JMI})中的第一到第四项。
+}
+\label{tab:c4_comp_ibs}
+\setlength{\tabcolsep}{3.1mm}{
+\begin{tabularx}{\linewidth}{@{}lcccccc||cccc@{}}
+\toprule
+
+\multirow{2}{*}{VLMs} 
+&\multicolumn{5}{c}{CIB Terms}
+&\multirow{2}{*}{PER}
+&\multicolumn{2}{c}{MI Estimator}
+&\multirow{2}{*}{PER}
+\\ 
+
+\cmidrule(lr){2-6}
+\cmidrule(lr){8-9}
+
+&$I(\Ymat; \Tmat)$
+&\ding{202}
+&\ding{203}
+&\ding{204}
+&\ding{205}
+&
+
+&Upper Bound
+&Lowe Bound
+&
+\\ 
+
+\midrule
+
+%*******************************************************************
+\multirow{5}{*}{\makecell[l]{LXMERT\citep{tan2019lxmert}}}
+&\checkmark 
+& & & &
+&70.41
+
+& &
+&70.41
+\\ 
+
+&\checkmark 
+&\checkmark &\checkmark & & 
+&72.17
+
+&L1Out
+&NWJ
+&72.31  
+\\ 
+
+&\checkmark 
+& & &\checkmark &\checkmark 
+&72.07
+
+&CLUB 
+&InfoNCE 
+&72.34
+\\ 
+
+&\checkmark 
+&\checkmark &\checkmark & &\checkmark 
+&72.28 
+
+&CLUB 
+&MINE 
+&72.48 
+\\ 
+
+&\checkmark 
+&\checkmark &\checkmark &\checkmark &\checkmark 
+&\textbf{72.62} 
+
+&CLUB 
+&NWJ 
+&\textbf{72.62} 
+\\ 
+
+
+\midrule
+%*******************************************************************
+\multirow{5}{*}{\makecell[l]{UNITER$_{\text{B}}$\citep{chen2020uniter}}}
+&\checkmark 
+& & & &
+&62.68
+
+& &
+&62.68
+\\ 
+
+&\checkmark 
+&\checkmark &\checkmark & & 
+&64.07
+
+&L1Out
+&NWJ
+&64.27  
+\\ 
+
+&\checkmark 
+& & &\checkmark &\checkmark 
+&64.11
+
+&CLUB
+&InfoNCE
+&64.14
+\\ 
+
+&\checkmark 
+&\checkmark &\checkmark & &\checkmark 
+&63.23
+
+&CLUB
+&MINE
+&64.32 
+\\ 
+
+&\checkmark 
+&\checkmark &\checkmark &\checkmark &\checkmark 
+&\textbf{{64.45}}
+
+&CLUB
+&NWJ
+&\textbf{64.45} 
+\\ 
+
+\midrule
+%*******************************************************************
+\multirow{5}{*}{\makecell[l]{ALBEF\citep{li2021align}}}
+&\checkmark 
+& & & &
+&65.66
+
+& &
+&65.66
+\\ 
+
+&\checkmark 
+&\checkmark &\checkmark & & 
+&67.11
+
+&L1Out
+&NWJ 
+&67.68 
+\\ 
+
+&\checkmark 
+& & &\checkmark &\checkmark 
+&67.00
+
+&CLUB
+&InfoNCE
+&\textbf{68.00}
+\\ 
+
+&\checkmark 
+&\checkmark &\checkmark & &\checkmark 
+&66.84 
+
+&CLUB
+&MINE
+&67.91 
+\\ 
+
+&\checkmark 
+&\checkmark &\checkmark &\checkmark &\checkmark 
+&\textbf{68.00} 
+
+&CLUB 
+&NWJ
+&\textbf{68.00} 
+\\ 
+
+\bottomrule
+\end{tabularx}
+}
+\end{table}

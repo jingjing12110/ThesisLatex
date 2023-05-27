@@ -1,0 +1,147 @@
+% !TeX root = ../main.tex
+\chapter{定理5.1证明}
+
+
+为了证明\textbf{定理 5.1}，该附录首先介绍互信息的相关性质。具体来说，
+% \subsection{互信息的性质} 
+对于任意的随机变量$\Xmat$、 $\Ymat$ 和 $\Zmat$：
+\begin{enumerate}[itemindent=1.2em]
+\item[$(P_1)$] 非负性：$I(\Xmat; \Ymat) \ge 0, ~I(\Xmat; \Ymat|\Zmat)\ge 0$；
+% \begin{align*}
+% \end{align*}
+\item[$(P_2)$] 链式法则：
+\begin{align*}
+I(\Xmat, \Ymat; \Zmat) &= I(\Ymat; \Zmat) + I(\Xmat; \Zmat|\Ymat) = I(\Xmat; \Zmat) + I(\Ymat; \Zmat|\Xmat)\\
+&= \frac{1}{2} [I(\Ymat; \Zmat) + I(\Xmat; \Zmat) + I(\Xmat; \Zmat|\Ymat) + I(\Ymat; \Zmat|\Xmat)];
+\end{align*}
+\item[$(P_3)$] 链式法则（多元互信息）： $I(\Xmat; \Ymat; \Zmat) = I(\Ymat; \Zmat) - I(\Ymat; \Zmat|\Xmat)$；
+% \begin{align*}
+% I(\Xmat; \Ymat; \Zmat) = I(\Ymat; \Zmat) - I(\Ymat; \Zmat|\Xmat). 
+% \end{align*}
+\item[$(P_4)$] 离散熵的非负性（离散变量 $\Xmat$）： $H(\Xmat)\ge 0, H(\Xmat|\Ymat)\ge 0$；
+% \begin{align*}
+% H(\Xmat)\ge 0, H(\Xmat|\Ymat)\ge 0. 
+% \end{align*}
+\item[$(P_5)$] 互信息与熵：$H(\Xmat)= H(\Xmat|\Ymat)+ I(\Xmat; \Ymat)$。
+% \begin{align*}
+% H(\Xmat)= H(\Xmat|\Ymat)+ I(\Xmat; \Ymat). 
+% \end{align*}
+\end{enumerate}
+
+% *******************************************************************
+% \subsection{引理声明} 
+然后，本文声明三个易证的引理。
+
+\begin{lemma}
+\label{lem:mi_xz_condition}
+在表征学习过程中，给定随机变量 $\Xmat$，定义随机变量 $\Zmat$ 为$\Xmat$对应的表征；一旦$\Xmat$被观测，则$\Zmat$条件独立于模型中任何其它变量。
+即，对于模型中任意其它变量$\Tmat_1$ 和 $\Tmat_2$，有
+\begin{align}
+I(\Zmat; \Tmat_1|\Xmat, \Tmat_2) = 0. 
+\end{align}
+\end{lemma} 
+
+
+% *******************************************************************
+\begin{lemma}
+\label{lem:mi_xz_mutual}
+给定随机变量 $\Xmat_1,$ $\Xmat_2, ..., \Xmat_n$ 和确定性函数 $f$，对 $\forall \, i, j = 1, 2, ..., n,$ 有
+\begin{align}
+I(\Xmat_i; f(\Xmat_i)) \ge I(\Xmat_j; f(\Xmat_i)). 
+\end{align}
+\end{lemma}
+\begin{proof}
+根据定义有，
+\begin{align*}
+I(\Xmat_i; f(\Xmat_i)) &= H(f(\Xmat_i)) - H(f(\Xmat_i) \mid \Xmat_i), \\
+I(\Xmat_j; f(\Xmat_i)) &= H(f(\Xmat_i)) - H(f(\Xmat_i) \mid \Xmat_j). 
+\end{align*}
+$f$ 是确定性函数，所以
+\begin{align*}
+H(f(\Xmat_i) \mid \Xmat_i) &= 0, ~~H(f(\Xmat_i) \mid \Xmat_j) \ge 0. 
+\end{align*}
+因此，
+\begin{align*}
+I(\Xmat_i; f(\Xmat_i)) \ge I(\Xmat_j; f(\Xmat_i)).
+\end{align*}
+\end{proof}
+
+
+% *******************************************************************
+\begin{lemma}
+分别用 $\Zmat_1$ 和 $\Zmat_2$ 表示 $\Xmat_1$ 和 $\Xmat_2$ 的表征，则
+\begin{align}
+&I_\theta(\Xmat_1;\Zmat_1|\Xmat_2) \le \KL(p_\theta(\Zmat_1|\Xmat_1)||p_\psi(\Zmat_2|\Xmat_2)), \\
+&I_\psi(\Xmat_2;\Zmat_2|\Xmat_1) \le \KL(p_\psi(\Zmat_2|\Xmat_2)||p_\theta(\Zmat_1|\Xmat_1)). 
+\end{align} 
+\end{lemma} 
+\begin{proof}
+根据定义有，
+\begin{align*}
+I_\theta(\Xmat_1; \Zmat_1|\Xmat_2)
+&= \E_{\xv_1, \xv_2 \sim p(\Xmat_1, \Xmat_2)} \E_{\zv \sim p_\theta(\Zmat_1|\Xmat_1)}\left[\log\frac{p_\theta(\Zmat_1 = \zv|\Xmat_1=\xv_1)}{p_\theta(\Zmat_1=\zv|\Xmat_2=\xv_2)}\right]\\
+&=\E_{\xv_1, \xv_2\sim p(\Xmat_1, \Xmat_2)}\E_{\zv \sim p_\theta(\Zmat_1|\Xmat_1)}\left[\log\frac{p_\theta(\Zmat_1=\zv | \Xmat_1=\xv_1)}{p_\psi(\Zmat_2 = \zv | \Xmat_2 = \xv_2)}
+\right] \\ 
+&\quad - \E_{\xv_1, \xv_2 \sim p(\Xmat_1, \Xmat_2)}\E_{\zv \sim p_\theta(\Zmat_1|\Xmat_1)}\left[\log\frac{p_\theta(\Zmat_1 = \zv | \Xmat_2=\xv_2)}{p_\psi(\Zmat_2=\zv | \Xmat_2= \xv_2)}
+\right]
+\\ 
+&=\KL(p_\theta(\Zmat_1|\Xmat_1)||p_\psi(\Zmat_2|\Xmat_2)) - \KL(p_\theta(\Zmat_2|\Xmat_1)||p_\psi(\Zmat_2|\Xmat_2))\\ 
+&\le \KL(p_\theta(\Zmat_1|\Xmat_1)||p_\psi(\Zmat_2|\Xmat_2)). 
+\end{align*} 
+当且仅当 $p_\psi(\Zmat_2|\Xmat_2)$ 与 $p_\theta(\Zmat_1|\Xmat_2)$ 同分布时，该不等式的等号成立。类似地，本文还可以推导出 $I_\psi(\Xmat_2; \Zmat_2|\Xmat_1)\le \KL(p_\psi(\Zmat_2|\Xmat_2)||p_\theta(\Zmat_1|\Xmat_1))$。
+\end{proof}
+
+
+% *****************************************************************
+% \section{定理 5.1 的证明}
+最后，本文使用上述互信息特性和引理证明\textbf{定理 5.1}。
+
+\begin{theorem}[互信息$I(\Xmat^v, \Xmat^l; \Tmat^v, \Tmat^l)$的上界]
+给定两组随机变量$\Xmat=[\Xmat^v, \Xmat^l]$和$\Tmat=[\Tmat^v, \Tmat^l]$，互信息$I(\Xmat^v, \Xmat^l; \Tmat^v, \Tmat^l)$的下界可表述为：
+\begin{equation}
+\begin{aligned}
+I(\Xmat; \Tmat) = I(\Xmat^v, \Xmat^l; \Tmat^v, \Tmat^l) \le \underbrace{I(\Xmat^v; \Tmat^v)}_{\text{\small{\ding{202}}}} + \underbrace{I(\Xmat^l; \Tmat^l)}_{\text{\small{\ding{203}}}} \underbrace{- I(\Tmat^v; \Tmat^l)}_{\text{\small{\ding{204}}}} + \underbrace{\SKL}_{\text{\small{\ding{205}}}}, 
+\end{aligned}
+\label{eq:JMI}
+\end{equation}
+式中，$\SKL$表示对称KL散度，可以通过平均两个KL散度$\KL(p(t^v|x^v)||p(t^l|x^l))$和$\KL(p(t^l|x^l)||p(t^v|x^v))$来计算。
+\end{theorem}
+\begin{proof}
+\begin{align*}
+I(\Xmat; \Tmat) &= I(\Xmat^l, \Xmat^v; \Tmat) \\
+&\stackrel{(P_2)}{=}\frac{1}{2}[I(\Xmat^l; \Tmat) + I(\Xmat^v; \Tmat) + I(\Xmat^l; \Tmat|\Xmat^v) + I(\Xmat^v; \Tmat|\Xmat^l)]\\
+&=\frac{1}{2}[I(\Xmat^l; \Tmat^l, \Tmat^v) + I(\Xmat^v; \Tmat^l, \Tmat^v) + I(\Xmat^l; \Tmat|\Xmat^v) + I(\Xmat^v; \Tmat|\Xmat^l)]
+\end{align*}
+其中，
+\begin{align*}
+I(\Xmat^l; \Tmat^l, \Tmat^v) &\stackrel{(P_2)}{=}I(\Xmat^l; \Tmat^l) + I(\Xmat^l; \Tmat^v|\Tmat^l) \\ 
+&\stackrel{(P_3)}{=}I(\Xmat^l; \Tmat^l) + I(\Xmat^l; \Tmat^v) - I(\Xmat^l; \Tmat^v; \Tmat^l)\\
+&\stackrel{(P_3)}{=}I(\Xmat^l; \Tmat^l) + I(\Xmat^l; \Tmat^v) - I(\Tmat^l; \Tmat^v) + I(\Tmat^l; \Tmat^v|\Xmat^l) \\
+&\stackrel{(LA.1.)}{=}I(\Xmat^l; \Tmat^l) + I(\Xmat^l; \Tmat^v) - I(\Tmat^l; \Tmat^v)\\ 
+&\stackrel{(LA.2.)}{\le}2I(\Xmat^l; \Tmat^l) - I(\Tmat^l; \Tmat^v). 
+\end{align*}
+类似地，$I(\Xmat^v; \Tmat^l, \Tmat^v)$ 的上界为： 
+\begin{align*}
+I(\Xmat^v; \Tmat^l, \Tmat^v) \le 2I(\Xmat^v; \Tmat^v) - I(\Tmat^l; \Tmat^v). 
+\end{align*} 
+又, 
+\begin{align*}
+I(\Xmat^l; \Tmat|\Xmat^v) &= I(\Xmat^l; \Tmat^l, \Tmat^v|\Xmat^v)\\
+&\stackrel{(P_2)}{=} I(\Xmat^l; \Tmat^l|\Xmat^v) + I(\Xmat^l; \Tmat^v|\Xmat^v,\Tmat^l) \\ 
+&\stackrel{(LA.1.)}{=} I(\Xmat^l; \Tmat^l|\Xmat^v), \\ 
+% 
+I(\Xmat^v; \Tmat|\Xmat^l) &= I(\Xmat^v; \Tmat^l, \Tmat^v|\Xmat^l)\\
+&\stackrel{(P_2)}{=} I(\Xmat^v; \Tmat^v|\Xmat^l) + I(\Xmat^v; \Tmat^l|\Xmat^l,\Tmat^v) \\ 
+&\stackrel{(LA.1.)}{=} I(\Xmat^v; \Tmat^v|\Xmat^l). \\ 
+\end{align*}
+令 $\SKL=\frac{1}{2}\left(\KL(p_\theta||p_\psi) + \KL(p_\psi||p_\theta)\right)$, \\ 
+则，
+\begin{align*}
+I(\Xmat; \Tmat) &= I(\Xmat^l, \Xmat^v; \Tmat^l, \Tmat^v)\\
+&\le I(\Xmat^l; \Tmat^l) + I(\Xmat^v; \Tmat^v) - I(\Tmat^l; \Tmat^v) + \frac{1}{2}[I(\Xmat^l; \Tmat^l|\Xmat^v) + I(\Xmat^v; \Tmat^v|\Xmat^l)]\\ 
+&\stackrel{(LA.3.)}{\le} I(\Xmat^l; \Tmat^l) + I(\Xmat^v; \Tmat^v) - I(\Tmat^l; \Tmat^v)\\
+&\qquad + \frac{1}{2}[\KL(p_\theta(\Tmat_1|\Xmat_1)||p_\psi(\Tmat_2|\Xmat_2)) + \KL(p_\psi(\Tmat_2|\Xmat_2)||p_\theta(\Tmat_1|\Xmat_1))]\\
+&=I(\Xmat^l; \Tmat^l) + I(\Xmat^v; \Tmat^v) - I(\Tmat^l; \Tmat^v) + \SKL. 
+\end{align*}
+\end{proof}
+

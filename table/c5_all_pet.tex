@@ -1,0 +1,294 @@
+\begin{table}[!t]
+\caption{
+在VQA v2 val、GQA test-dev和OK-VQA test上的性能(\%)比较
+% 。\#Param 表示可调参数量（单位：兆字节），\#Sample 表示训练时使用的训练样本个数。
+}
+\label{tab:c5_all_pet}
+\setlength{\tabcolsep}{1.6mm}{
+\begin{tabularx}{\linewidth}{lccccccc}
+\toprule
+
+\multirow{2}{*}{Method} 
+&\multicolumn{1}{c}{\#Param} 
+&\multicolumn{6}{c}{\#Sample}
+\\
+
+\cmidrule(l){3-8}
+
+&\multicolumn{1}{c}{(M)} 
+&$N_{\mathcal{D}}$=16 
+&$N_{\mathcal{D}}$=32 
+&$N_{\mathcal{D}}$=64 
+&$N_{\mathcal{D}}$=100 
+&$N_{\mathcal{D}}$=500 
+&$N_{\mathcal{D}}$=1,000 
+\\ 
+
+\midrule
+
+\multicolumn{8}{c}{\textbf{VQA v2 val}}
+\\ 
+
+\rowcolor{gray!40}%[-1pt][0pt]
+Finetuning &224.54 
+&41.82$~\std{1.58}$
+&43.09$~\std{3.10}$
+&46.87$~\std{0.57}$
+&48.12$~\std{0.87}$
+&53.46$~\std{0.41}$
+&55.56$~\std{0.13}$
+\\ 
+
+% *********Specification-based **********
+% bs=32, lr=4e-5 
+BitFit~\cite{zaken2022bitfit} 
+&0.29  
+&40.61$~\std{4.15}$ % fixed
+&43.86$~\std{2.19}$
+&46.14$~\std{1.00}$
+&47.53$~\std{0.67}$
+&51.91$~\std{0.40}$
+&53.18$~\std{0.58}$
+\\
+
+% *********Reparameterization-based **********
+LoRA~\cite{hu2022lora}
+&0.44 
+&41.60$~\std{2.27}$
+&42.62$~\std{2.41}$
+&45.36$~\std{1.66}$
+&47.57$~\std{0.91}$
+&51.93$~\std{0.38}$
+&54.15$~\std{0.45}$
+\\ 
+
+Compacter~\cite{karimi2021compacter}  
+&0.34 
+&39.28$~\std{1.87}$ % fixed
+&42.47$~\std{2.76}$
+&44.91$~\std{1.27}$
+&46.28$~\std{1.37}$
+&51.21$~\std{0.90}$
+&53.39$~\std{0.54}$
+\\ 
+
+% *********Addition-based **********
+Houlsby-Adapter ~\cite{houlsby2019parameter}
+&4.76 
+&41.71$~\std{2.16}$ % fixed
+&44.01$~\std{2.09}$
+&45.11$~\std{1.40}$
+&47.71$~\std{0.78}$
+&52.27$~\std{1.05}$
+&54.31$~\std{0.34}$
+\\ 
+
+
+Pfeiffer-Adapter~\cite{pfeiffer2020adapterfusion} 
+&2.38 
+&41.48$~\std{1.86}$ % fixed
+&44.18$~\std{2.13}$
+&45.93$~\std{1.11}$
+&47.42$~\std{1.15}$
+&52.35$~\std{0.52}$
+&53.98$~\std{0.38}$
+\\ 
+
+
+AdaMix~\cite{wang2022adamix}
+&5.92 
+&40.59$~\std{2.05}$
+&43.42$~\std{2.08}$
+&46.70$~\std{1.32}$
+&47.34$~\std{0.91}$
+&51.72$~\std{1.05}$
+&54.12$~\std{0.63}$
+\\ 
+
+\text{MixPHM} 
+&0.87
+&\textbf{\color{blue}{43.13$~\std{1.78}$}}
+&\textbf{\color{blue}{45.97$~\std{2.01}$}}
+&\textbf{\color{blue}{48.26$~\std{0.56}$}}
+&\textbf{\color{blue}{49.91$~\std{0.76}$}}
+&\textbf{\color{blue}{54.30$~\std{0.33}$}}
+&\textbf{\color{blue}{56.11$~\std{0.40}$}}
+\\ 
+
+\midrule
+\multicolumn{8}{c}{\textbf{GQA test-dev}}
+\\
+
+\rowcolor{gray!40}
+Finetuning &224.54 
+&28.24$~\std{2.08}$ 
+&30.80$~\std{2.49}$
+&34.22$~\std{0.59}$
+&36.15$~\std{0.99}$ 
+&41.49$~\std{0.54}$ 
+&43.04$~\std{0.57}$ 
+\\ 
+
+BitFit~\cite{zaken2022bitfit} 
+&0.29 
+&26.13$~\std{2.83}$ 
+&29.00$~\std{4.81}$ 
+&34.25$~\std{1.16}$
+&35.91$~\std{1.22}$
+&40.08$~\std{0.42}$
+&41.84$~\std{0.15}$
+\\
+
+LoRA~\cite{hu2022lora}
+&0.44 
+&26.89$~\std{2.74}$ % fixed
+&30.40$~\std{2.27}$
+&34.40$~\std{0.99}$
+&36.14$~\std{1.10}$
+&40.20$~\std{1.02}$
+&42.06$~\std{1.12}$
+\\ 
+
+Compacter~\cite{karimi2021compacter}  
+&0.34 
+&23.70$~\std{2.10}$
+&27.18$~\std{2.61}$ %fixed
+&32.70$~\std{1.30}$
+&35.28$~\std{1.45}$
+&38.68$~\std{0.50}$
+&41.17$~\std{0.95}$
+\\ 
+
+Houlsby-Adapter ~\cite{houlsby2019parameter}
+&4.76 
+&25.13$~\std{2.32}$ %fixed 
+&28.34$~\std{1.17}$
+&33.23$~\std{0.94}$
+&35.88$~\std{1.79}$
+&40.85$~\std{0.48}$ 
+&41.90$~\std{0.72}$
+\\ 
+
+% d=64,lr=2e-4 
+Pfeiffer-Adapter~\cite{pfeiffer2020adapterfusion} 
+&2.38 
+&25.08$~\std{1.81}$ %fixed 
+&29.18$~\std{1.32}$ 
+&32.97$~\std{0.84}$
+&35.08$~\std{1.01}$
+&40.30$~\std{0.40}$
+&41.39$~\std{0.27}$
+\\ 
+
+% d=64,lr=2e-4
+AdaMix~\cite{wang2022adamix}
+&5.92 
+&24.62$~\std{2.34}$ %fixed
+&28.01$~\std{1.33}$
+&32.74$~\std{0.96}$
+&35.64$~\std{0.94}$
+&40.14$~\std{0.42}$
+&41.97$~\std{0.86}$
+\\ 
+
+MixPHM
+&0.87
+&\textbf{\color{blue}{28.33$~\std{2.63}$}}
+&\textbf{\color{blue}{32.40$~\std{2.52}$}}
+&\textbf{\color{blue}{36.75$~\std{0.55}$}}
+&\textbf{\color{blue}{37.40$~\std{0.87}$}}
+&\textbf{\color{blue}{41.92$~\std{0.55}$}}
+&\textbf{\color{blue}{43.81$~\std{0.50}$}}
+\\ 
+
+\midrule
+\multicolumn{8}{c}{\textbf{OK-VQA test}}
+\\
+
+\rowcolor{gray!40}%[-1pt][0pt]
+Finetuning &224.54 
+&11.66$~\std{2.08}$
+&14.20$~\std{0.78}$
+&16.65$~\std{1.02}$
+&18.28$~\std{0.67}$
+&24.07$~\std{0.40}$
+&26.66$~\std{0.72}$
+\\ 
+
+BitFit~\cite{zaken2022bitfit} 
+&0.29
+&11.29$~\std{1.79}$ %fixed
+&13.66$~\std{1.49}$
+&15.29$~\std{0.57}$
+&16.51$~\std{0.53}$
+&22.54$~\std{0.57}$
+&24.80$~\std{0.63}$
+\\
+
+% 
+LoRA~\cite{hu2022lora}
+&0.44
+&10.26$~\std{1.53}$
+&12.46$~\std{1.82}$
+&15.95$~\std{0.38}$
+&17.03$~\std{0.82}$
+&23.02$~\std{0.41}$
+&25.26$~\std{0.53}$
+\\ 
+
+Compacter~\cite{karimi2021compacter}  &0.34 
+&9.64$~\std{2.73}$ %fixed
+&11.04$~\std{1.39}$
+&13.57$~\std{1.07}$
+&15.92$~\std{1.18}$
+&22.20$~\std{0.89}$
+&24.52$~\std{0.59}$
+\\ 
+
+% \cline{2-11}
+
+Houlsby-Adapter ~\cite{houlsby2019parameter}
+&4.76 
+&9.79$~\std{1.71}$
+&12.25$~\std{2.13}$
+&15.04$~\std{1.25}$
+&16.58$~\std{0.65}$
+&22.67$~\std{0.77}$
+&25.04$~\std{0.44}$
+\\ 
+
+Pfeiffer-Adapter~\cite{pfeiffer2020adapterfusion} 
+&2.38
+&9.06$~\std{0.53}$
+&11.39$~\std{0.79}$
+&14.23$~\std{1.54}$
+&16.34$~\std{0.79}$
+&22.90$~\std{1.03}$
+&26.70$~\std{0.71}$
+\\ 
+
+AdaMix~\cite{wang2022adamix}
+&5.92 
+&8.39$~\std{1.20}$
+&11.55$~\std{1.37}$
+&13.66$~\std{2.29}$
+&16.27$~\std{0.92}$
+&23.20$~\std{0.78}$
+&26.34$~\std{0.88}$
+\\ 
+
+MixPHM
+&0.87
+&\textbf{\color{blue}{13.87$~\std{2.39}$}} 
+&\textbf{\color{blue}{16.03$~\std{1.23}$}}
+&\textbf{\color{blue}{18.58$~\std{1.42}$}} 
+&\textbf{\color{blue}{20.16$~\std{0.97}$}}
+&\textbf{\color{blue}{26.08$~\std{0.88}$}} 
+&\textbf{\color{blue}{28.53$~\std{0.85}$}} 
+\\ 
+
+\bottomrule
+\end{tabularx}
+}
+\end{table}
+% *************************************************************************

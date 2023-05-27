@@ -1,0 +1,180 @@
+% !TeX root = ../main.tex
+
+\xchapter{相关研究进展和与存在的问题}{Review of Related Works}
+
+本章将就视频问答、视觉问答中的分布外泛化、视觉问答中的输入鲁棒性和视觉问答中的低资源学习四方面的相关研究进展与存在的问题进行讨论。
+本文提出的所有方法的具体细节和相关实验将在后续各章节中依次展开。
+
+
+% ******************************************************************
+\xsection{视频问答}{Video Question Answering}
+
+% % ******************************************************************
+% \xsubsection{图像视觉问答}{Image Question Answering} 
+
+% 基于图像的视觉问答任务~\cite{antol2015vqa} 要求模型根据给定的图像和问题自动推理并生成问题的答案。
+% 本文依据模型中使用的主要技术将现有的视觉问答方法概括地分为基于图网络的视觉问答方法、基于多模态预训练模型的视觉问答方法以及其它的视觉问答方法。
+
+
+% \subsubsection{基于图网络的视觉问答方法}
+% 图神经网络（GNN）~\cite{scarselli2008graph}是一种用于处理图结构的数据的深度学习模型，即利用图结构来聚合邻域的节点信息。 
+% 图神经网络因强大的节点间关系的建模能力而在各种任务和应用中被广泛使用，如图分类~\cite{zhang2018end,bai2020learning} 和跨模式检索~\cite{wang2020learning,song2021spatial}。
+% % 和视觉问答~\cite{huang2020location,jiang2021x}。
+% 视觉关系的表征和建模是理解图像（视频）中高阶语义信息的重要手段，对回答语义复杂的问题十分重要。
+% 因此，图神经网络在视觉问答任务中也被广泛使用。
+% 早期基于关系建模的方法~\cite{wu2018object,cadene2019murel}考虑特征级别的关系建模，通过对图像中目标间的特征进行差分操作来比较目标间的关系或利用可迭代的单元模块对空间特征和多模态特征进行关系建模。
+% 这类方法未考虑图像中目标间细粒度的视觉关系。
+% % 具体来说，Wu 等人~\cite{wu2018object}通过对图像中目标间的特征进行差分操作来比较目标间的关系。MuRel~\cite{cadene2019murel}考虑细粒度的问题和图像区域间的关系，利用可迭代的单元模块对空间特征和多模态特征进行关系建模。
+% 视觉关系~\cite{lu2016visual,shang2017video}通常以三元组的形式表示并用来刻画两个目标间的关系属性。考虑视觉关系的显式定义，基于关系建模的视觉问答方法~\cite{li2019relation,hu2019language}通常利用场景图来表征图像（视频）中视觉关系的集合，然后利用图神经网络对场景图进行编码得到语义丰富的高阶视觉表征。
+
+
+% \subsubsection{基于多模态预训练模型的视觉问答方法}
+% 受益于大规模视觉文本数据和各种Transformer~\cite{vaswani2017attention}结构，视觉语言预训练技术以先预训练后微调的方式显著地提高了下游任务的性能。
+% 作为典型的下游任务之一，视觉问答的性能也得到了巨大提升。
+% 早期代表性的视觉语言预训练模型，如ViLBERT~\cite{lu2019vilbert}、VL-BERT~\cite{su2019vl}、VisualBERT~\cite{li2019visualbert}、UNITER~\cite{chen2020uniter}、LXMERT~\cite{tan2019lxmert} 和 OSCAR~\cite{li2020oscar}，在微调过程中将视觉问答任务表述为多答案分类问题，训练额外的答案分类模块进行答案预测。
+% 此后，为了统一预训练和微调过程中的训练目标和网络结构（无需为不同的下游任务添加特定的任务处理模块），VL-T5~\cite{cho2021unifying}、UniVL~\cite{liu2021unified}和UNICORN~\cite{yang2021crossing}等模型将视觉问答任务统一为文本生成任务。
+% 这不仅减小了预训练和微调过程训练目标的鸿沟，还提高了视觉问答分布外的泛化能力。
+% 除了众多关注视觉语言预训练本身的研究外，近期有少数工作~\cite{jin2022good,jiang2022finetuning}也开始探讨如何在特定的下游任务上直接使用已有的视觉语言预训练模型。
+
+
+% \subsubsection{其它的视觉问答方法}
+% 早期的视觉问答方法致力于将视觉和文本特征映射到同一嵌入空间进行多模态交互和融合，可以进一步分为基于联合嵌入的方法和基于注意力机制的方法。
+% % 联合嵌入的方法通常先将视觉和语言表征映射到同一嵌入空间，然后对视觉语言表征进行交互和融合。
+% 基于联合嵌入的方法为更好地实现表征融合并生成用于答案预测的联合表征，提出了许多多模态融合的方法，如多模态压缩双线性融合~\cite{fukui2016multimodal}、多模态低秩双线性融合~\cite{kim2016hadamard}、多模态因式分解双线性融合~\cite{yu2017multi} 和多模态塔克张量分解融合~\cite{ben2017mutan}。
+% 与表征的串联、按位加和按位乘相比，上述的这些基于向量外积操作的方法能实现更具表达能力的特征
+% 融合，但也会引起视觉问答模型参数维度的急剧增长，增加了视觉问答模型计算代价。
+% 基于注意力机制的方法利用注意力机制来学习如何从大量的视觉语言信息中筛选出问题相关的内容。
+% 早期的方法主要是基于问题引导的视觉注意力~\cite{xu2016ask,yang2016stacked,shih2016look,patro2018differential}，即利用问题单向地注意视觉区域中与问题相关的区域。
+% 而为了更好地进行视觉语言交互，基于共同注意力的视觉问答方法~\cite{lu2016hierarchical,nam2017dual,nguyen2018improved,yu2019deep,vaswani2017attention,gao2019dynamic}被提出。基于共同注意力的视觉问答模型既通过视觉引导生成语言的注意力同时也利用语言生成视觉的注意力。
+% 此外还有基于自下而上视觉注意的视觉问答方法~\cite{anderson2018bottom}，即利用目标检测器预先生成区域级的视觉特征，从而实现对视觉信息的筛选。
+
+% % \subsubsection{基于模块网络的视觉问答}
+% 基于模块网络的方法~\cite{andreas2016neural,hu2017learning}考虑视觉问答模型的可解释性，受人类回答问题的过程启发，将视觉问答任务拆分成不同子任务，并设计基于子任务的特定的子模块，利用模块网络的组合。
+% 这种基于模块网络的视觉问答方法虽然可以根据不同问题动态地生成不同的推理序列，但在训练过程中需要提供推理步骤的监督信息。
+% 为了解决对监督信息的依赖问题，Stack-NMN~\cite{hu2018explainable}引导子任务自动分解并进行组合推理。而Chen 等人~\cite{chen2021meta}提出的元模块化网络 MMN 可以动态地演化成不同的实例模块，然后将这些模块构建成一个可执行的图结构，用于复杂的可视化推理。此外，Akular 等人~\cite{akula2021robust} 提出使视觉问答模型自适应性地关注来自视觉和文本输入中潜在的重要目标。
+% % TODO: 改重复率
+% % 典型的视觉问答模型一般包含视觉编码模块、语言编码模块、多模态融合模块和答案推理生成模块。
+
+
+\xsubsection{视频问答方法}{Video Question Answering Method} 
+
+视频问答任务~\cite{xu2017video} 旨在回答与视频内容有关的问题。
+当前视频问答方法可以大体分为基于注意力的方法~\cite{xu2017video,jiang2020divide,gao2018motion,zha2019spatiotemporal,le2020hierarchical}、基于图网络的方法~\cite{jiang2020reasoning,huang2020location,wang2021dualvgr,seo2021attend,park2021bridge} 和基于预训练的方法~\cite{amrani2021noise,lei2021less,seo2021look,yang2021just}这三类。
+基于注意力的大多数方法都是提取整体的视觉外观和运动特征来表示视频内容，并设计不同的注意机制，如问题引导的注意机制~\cite{xu2017video,jiang2020divide}和共同注意机制~\cite{gao2018motion,zha2019spatiotemporal}，来整合这些特征。
+这些方法侧重于对视频内容的整体理解，可能会忽略语义复杂的问题所涉及的有意义的、细粒度的视频内容。
+为了回答基于细粒度视频内容理解的复杂语义问题，基于图网络的方法~\cite{jin2019multi,jiang2020reasoning,le2020hierarchical,huang2020location,kim2020modality,wang2021dualvgr,seo2021attend,park2021bridge}被提出来编码和推理目标间的关系。
+具体来说，Jin 等人~\cite{jin2019multi}提出了多模态和多层次的交互网络来捕捉物体之间的关系。Jiang 等人~\cite{jiang2020reasoning}提出了异质图对齐网络来整合模式间和模式内的关系，并进行跨模式推理。Le 等人~\cite{le2020hierarchical}通过构建通用的神经推理单元，探索了更强大的多模态交互模式。Huang 等人~\cite{huang2020location}提出了位置感知的图卷积网络，对物体的位置和关系进行显式建模。Wang 等人~\cite{wang2021dualvgr}采用了堆叠式双视觉图推理单元DualVGR，对视频片段之间的丰富关系进行迭代建模。Seo 等人~\cite{seo2021attend}利用图卷积网络来计算外观和运动模块中物体之间的关系。Park 等人~\cite{park2021bridge}为视频和问题构建图表，并对问题与视觉的关系和视觉与视觉的关系进行编码。
+
+
+\xsubsection{语言编码}{Language Encoding}
+
+视频通常是包含视觉和语言信息的多模态数据。
+早期的视频问答方法~\cite{xu2017video,jiang2020divide,gao2018motion,zha2019spatiotemporal}通常仅考虑视频的视觉内容来推理问题的答案。 
+为了更好地理解视频内容，最近的研究工作已经开始将额外的语言信息，如字幕~\cite{lei2018tvqa,lei2020tvqa}、描述~\cite{kim2018multimodal,kim2020dense} 和知识~\cite{garcia2020knowit,garcia2020knowledge} 引入到视频问答任务中。
+具体来说，Lei等人~\cite{lei2018tvqa,lei2020tvqa} 利用LSTM~\cite{hochreiter1997long}对视频中的字幕进行全局编码。
+Garcia等人~\cite{garcia2020knowit,garcia2020knowledge} 对字幕进行凝练，将其转变为问题相关的知识，然后对知识进行全局编码。
+Park等人~\cite{park2021bridge} 对问题进行依存分析并构建稀疏问题图来编码问题获得多尺度的问题表征。
+最新基于预训练的方法~\cite{amrani2021noise,lei2021less,seo2021look,yang2021just} 利用Transformer~\cite{vaswani2017attention}统一编码视频视觉和语言内容以实现跨模态对齐和融合。
+本文的工作旨在处理通用的视频问答任务，该任务同时考虑了视频的视觉和语言信息，比上述针对视觉理解的视频问答任务更加实用。
+
+
+\xsubsection{图神经网络与关系推理}{Graph Neural Network and Relational Reasoning}
+图神经网络（GNN）~\cite{scarselli2008graph}是一种用于处理图结构的数据的深度学习模型，即利用图结构来聚合邻域的节点信息。 
+图神经网络因强大的节点间关系的建模能力而在各种任务和应用中被广泛使用，如图分类~\cite{zhang2018end,bai2020learning} 和跨模式检索~\cite{wang2020learning,song2021spatial}。
+近年来，许多图神经网络被提出，这些现有的图神经网络可以大致分为两类：基于谱域的图神经网络~\cite{bruna2013spectral,henaff2015deep,rippel2015spectral,defferrard2016convolutional}和基于空域的图神经网络~\cite{kipf2016semi,velivckovic2017graph,hamilton2017inductive}。
+具体来说，基于谱域的图神经网络首先通过图形傅里叶变换将图形转换到谱域，然后执行在谱域定义的卷积算子，最后用反傅里叶变换将编码的图转换回空间域。例如，Defferrard 等人~\cite{defferrard2016convolutional} 利用图拉普拉斯矩阵的Chebyshev扩展来定义谱滤波器，这减轻了特征分解的计算复杂性。
+基于空域的图神经网络直接在图上定义基于图拓扑结构的卷积运算符。
+例如，GAT~\cite{velivckovic2017graph} 是一个典型的基于空域的图神经网络。它在节点信息聚合步骤中加入了注意力机制，为邻居分配不同的权重以减轻节点噪声。
+已有的关系推理方法大致可分为基于图网络的方法~\cite{li2019relation,chen2019graph,gao2020multi}和基于神经符号的方法~\cite{garcez2019neural,vedantam2019probabilistic,amizadeh2020neuro}。
+基于图网络的关系推理~\cite{yao2018exploring,cadene2019murel,li2019visual,yang2020prior,pei2020visual,chen2020figure}被广泛应用于视觉和语言任务中。在进行视觉和语义推理任务时已经被证明是有效的，并且成为视觉和语言任务中关系推理的主流方法。具体来说，Li 等人~\cite{li2019relation}利用基于图注意力网络编码显式的语义和空间关系以及物体之间的隐式的全连接关系。Huang 等人~\cite{huang2020location}关注物体间的位置和关系的交互，并提出了位置感知的图卷积网络来建模物体间的隐式关系。最近的一项研究~\cite{zhu2020mucko}考虑了视觉、语义和知识模态中的显式关系，并提出了一种模态感知的异构图神经网络来编码不同模态间的关系。此外，Norcliffe 等人~\cite{norcliffe2018learning}以给定问题的背景为条件，用图学习模块更好地揭示和利用了对象之间的隐式关系。
+
+
+% ******************************************************************
+\xsection{视觉问答中的分布外泛化}{OOD Generalization in Visual Question Answering} 
+% **************************************************************************
+
+\xsubsection{分布外泛化方法}{OOD Generalization Method}
+在独立同分布的设置下训练和测试视觉问答模型，模型性能很大程度上会受到数据中的虚假相关~\cite{zhang2016yin,agrawal2016analyzing,goyal2017making,agrawal2018don}（即语言偏见或数据偏见）的影响。最近，在分布外的设置下~\cite{guo2019quantifying,teney2020value,kervadec2021roses,gokhale2020mutant} 评估视觉问答的性能因此变得越来越受人关注。
+目前主流的用于提高视觉问答模型分布外泛化性能的方法以消除语言偏见为目标。
+而当前视觉问答任务中消除语言偏见的方法可以进一步简单地分为两类：基于已知偏见的方法~\cite{clark2019don,chen2020counterfactual,liang2020learning} 和基于未知偏见的方法\cite{teney2020unshuffling,gokhale2020mutant,clark2020learning}。
+基于已知偏见的方法考虑了语言偏见的先验知识，
+并在此基础上设计了具体的去偏方法来减少训练集中显式存在的偏见。
+基于未知偏见的方法旨在消除语言偏见或答案分布的变化，而不需要事先知道偏见。因此基于未知偏见的方法更实用。
+除了通过使用人工标注数据~\cite{selvaraju2019taking,wu2019self,gokhale2020mutant}平衡数据来减少偏见外，大多数基于未知偏见的方法采用对抗训练策略~\cite{grand2019adversarial,teney2020learning,teney2020value,gokhale2020mutant,li2020closer,gan2020large}。
+具体来说，Teney 等人~\cite{teney2020learning}提出一种利用模型输出相对输入梯度的辅助损失来提高分布外泛化性能。
+Li 等人~\cite{li2020closer}提出主动学习对抗性噪声生成器，从采样的噪声中发现对抗性噪声分布并将生成的噪声添加到多模态表征中。
+VILLA~\cite{gan2020large}将对抗性扰动引入表征空间并利用大规模对抗性训练来提高泛化能力。
+
+
+\xsubsection{图生成模型}{Graph Generative Model}
+图生成模型旨在通过观察已有的图来学习并生成具有某些所需属性的新图。
+图生成模型已在生物医学~\cite{de2018molgan}、社会科学~\cite{nauata2020house} 和图表示学习中得到应用~\cite{yu2018learning,pan2018adversarially,wang2018graphgan}。
+深度生成模型的最新进展，特别是VAE~\cite{kingma2013auto} 和GAN~\cite{goodfellow2014generative}，已经向图域发展，并启发了许多图生成模型，如GAE~\cite{kipf2016variational}、GraphVAE~\cite{simonovsky2018graphvae}、GraphGAN~\cite{wang2018graphgan} 和Graphite~\cite{grover2019graphite}。
+这些图生成模型遵循统一的框架，但该框架因包括生成模型和判别模型而在一定程度上限制了生成图的可扩展性。
+为了解决可扩展性的挑战，深度自回归模型被用于图生成，例如GraphRNN~\cite{you2018graphrnn}、GRAN~\cite{liao2019efficient} 和GraphAF~\cite{shi2020graphaf}。
+此外，GRAM~\cite{kawai2019scalable} 引入了图注意机制来提高图生成模型的可扩展性。
+最近的一些工作已经开始考虑提高图生成模型的泛化能力。
+You 等人~\cite{you2020graph}提出了GraphCL，一种基于对比学习的框架，来学习鲁棒的图表征。Pan 等人~\cite{pan2018adversarially} 提出了一种新的对抗图嵌入框架，对图中的拓扑结构和节点内容进行编码来获得紧凑的图表征。
+Dai 等人~\cite{dai2018adversarial} 提出了一种对抗网络嵌入框架ANE，利用对抗性学习原理来正则化表征学习和辅助学习稳定和稳健的图表征。
+Zheng 等人~\cite{zheng2020distribution} 提出了DB-GAN，通过原型学习隐式地连接图和特征空间以学习更鲁棒的图表征。
+
+
+% ******************************************************************
+\xsection{视觉问答中的输入鲁棒性}{Input Robustness in Visual Question Answering}
+% **************************************************************************
+
+\xsubsection{提升输入鲁棒性的方法}{Robustness in Visual Question Answering}
+近来，为了促进视觉问答模型的实际应用，许多关于视觉问答鲁棒性的工作被提出，如人为对抗鲁棒性~\cite{li2021adversarial,sheng2021human}、输入鲁棒性~\cite{shah2019cycle,whitehead2020learning,agarwal2020towards,kant2021contrast}和应对答案分布变化的鲁棒性~\cite{goyal2017making,jiang2021x}。
+本文探讨视觉问答模型的输入鲁棒性，即视觉问答模型抵御模型输入中视觉和语言变化的能力，如问题的改写~\cite{shah2019cycle,whitehead2020learning}和图像的编辑~\cite{agarwal2020towards}。
+当前提升视觉问答模型输入鲁棒性的主流方法是数据增强。
+此外，对比学习~\cite{kant2021contrast}和对抗训练~\cite{li2020closer}也被用于提高输入鲁棒性。虽然数据增强是行之有效的方法，但生成的数据质量是不可控的，如表达能力有效和过度冗长，而且人工生成的过程很耗时。
+最近的这些研究都表明，最先进的视觉问答模型仍然容易受到输入变化的影响。
+
+
+\xsubsection{视觉语言预训练模型}{Vision-Language Model}
+视觉语言预训练~\cite{zhou2020unified,kim2021vilt,huang2021seeing}旨在学习任务无关的视觉语言表征并以微调的方式来提高下游任务的性能。
+从模型结构的角度来分，当前的视觉语言预训练模型可以简单分为三类： 单流模型~\cite{su2019vl,chen2020uniter,gan2020large,li2020oscar,zhang2021vinvl,kim2021vilt}、双流模型~\cite{lu2019vilbert,tan2019lxmert,lu202012,yu2020ernie,li2021scheduled}和编解码模型~\cite{cho2021unifying,li2021align,zeng2022multi,li2022blip,wang2022ofa}。
+具体来说，单流模型首先对齐图像区域和文本分词，然后使用一个统一的Transformer~\cite{vaswani2017attention}来学习上下文的表征。
+双流模型则是首先使用两个独立的Transformer分别作用于图像和文本来学习视觉和语言表征，然后使用一个跨模态的Transformer对获得的视觉和语言表征进行整合。
+而编解码模型首先使用编码器来学习多模态表示，然后使用解码器生成与特定下游任务相关的文本。
+本文统一这三种典型的视觉语言预训练模型结构，并提出相关信息瓶颈理论，用以在为视觉问答任务微调视觉语言预训练模型时提高视觉问答模型鲁棒性。
+视觉语言预训练~\cite{tan2019lxmert,gan2020large,huang2021seeing,zhang2021vinvl,jia2021scaling,kim2021vilt,li2021align,dou2022empirical,zhong2022regionclip} 旨在学习与任务无关的多模态表征并以微调的方式提高下游任务的性能。
+近来，有关视觉语言预训练的一种研究路线是致力于利用编码器-解码器框架和生成式建模的训练目标来统一预训练和微调过程~\cite{cho2021unifying,li2022blip,li2021align,hu2021unit,wang2022ofa}。这种统一的模型能在一定程度上提高下游任务的泛化能力。
+大规模的视觉语言预训练模型信息丰富，可以显著提高下游任务的性能。
+
+
+\xsubsection{信息瓶颈}{Information Bottleneck}
+信息瓶颈理论最初由Tishby 等人~\cite{tishby2000information}提出并用于信息压缩。
+随后，信息瓶颈理论被用于分析深度学习模型结构~\cite{tishby2015deep,shwartz2017opening}。本质上，信息瓶颈理论的目标是在最大化预测准确性和最小化表征复杂性之间寻求平衡。
+最近的一些研究开始利用信息瓶颈原理来提高模型的鲁棒性和泛化能力，尤其是在领域泛化~\cite{du2020learning,li2022invariant}、分布外泛化~\cite{ahuja2021invariance}、多视图表征学习~\cite{federici2020learning,bao2021disentangled}和预训练语言模型~\cite{mahabadi2021variational,wang2021infobert}方面。
+此外，一些研究~\cite{dubois2020learning,pan2020disentangled,jeon2021ib}致力于从信息瓶颈的角度学习解纠缠的最优表征。
+考虑到信息瓶颈理论可以促进模型学习紧凑且有意义的表征，本文因此将其扩展到视觉语言学习中。
+在为视觉问答任务微调视觉语言预训练模型时，应用信息瓶颈来学习更鲁棒的表征。
+
+
+
+% ******************************************************************
+\xsection{视觉问答中的低资源学习}{Low-Resource Learning in Visual Question Answering}
+% **************************************************************************
+
+\xsubsection{参数有效微调方法}{Parameter-Efficient Finetuning Method}
+在下游任务上对视觉语言预训练模型进行微调已经成为视觉语言学习的一个主流范式。然而，微调一个由数亿个参数组成的完整模型是十分消耗时间和计算资源的。
+参数有效微调~\cite{mahabadi2021parameter,yang2022prompt,ruckle2021adapterdrop,mao2022unipelt,he2022towards,yang2022robust,zhang2022differentiable} 在保持（大部分）预训练参数冻结的同时，替代性地调整轻量级的可训练参数，这在自然语言处理领域已经取得了巨大的成功。
+根据是否引入新的可训练参数，这些参数有效微调方法可以大致分为两类：(\emph{i}) 微调预训练模型的极小部分参数，如BitFit~\cite{zaken2022bitfit} 和 FISH Mask~\cite{sung2021training}；(\emph{ii}) 微调新添加的小量参数，如基于提示的微调~\cite{lester2021power,li2021prefix}、Adapter~\cite{houlsby2019parameter,pfeiffer2020adapterfusion} 和 低秩分解的方法~\cite{karimi2021compacter,hu2022lora}。
+受参数有效微调技术在自然语言处理领域中的成功启发，最近的一些工作~\cite{lin2022adapt,zhang2022hyperpelt,sung2022vl} 已经开始将其引入微调视觉语言预训练模型中了。
+具体来说，Lin 等人~\cite{lin2022adapt} 为视觉语言导航任务提出了动作级别的提示用于视觉语言预训练模型的微调。
+VL-Adapter~\cite{sung2022vl} 将Adapter进行扩展来为各种视觉语言任务微调视觉语言预训练模型。
+HyperPELT~\cite{zhang2022hyperpelt} 是一个兼顾了Adapter和提示微调技术的统一的参数有效微调框架。
+此外，Frozen~\cite{tsimpoukelli2021multimodal} 和 PICa~\cite{yang2022empirical} 采用提示微调技术，将大规模预训练语言模型的小样本学习能力迁移到处理小样本视觉语言任务中。
+本文发现，在对视觉语言预训练模型进行微调时，提示微调技术和Adapter被反复利用，而基于低秩分解的方法则很少被探讨。
+实际上，基于低秩分解方法在实践中更加参数有效，而且过度参数化的深度学习模型本身具有内在的低秩属性~\cite{oymak2019generalization,aghajanyan2021intrinsic,li2022parameter}，这启发了本文的研究。
+
+\xsubsection{专家混合模型}{Mixture-of-Experts}
+专家混合模型（Mixture-of-Experts，MoE）~\cite{shazeer2017outrageously}旨在通过条件计算扩大模型容量，同时保持计算效率。
+最新研究~\cite{lepikhin2021gshard,fedus2021switch,lin2021m6,roller2021hash,lewis2021base,riquelme2021scaling,du2022glam} 关注如何在预训练阶段使用稀疏专家混合模型和专门设计的路由机制来构建大规模的基于Transformer~\cite{vaswani2017attention}的视觉语言模型。
+相比之下，在参数有效的微调中稀疏专家混合模型还没有得到广泛的研究。
+MPOE~\cite{gao2022parameter} 和 AdaMix~\cite{wang2022adamix} 是极少数利用稀疏专家混合模型来微调预训练语言模型的两个工作。
+具体来说，MPOE~\cite{gao2022parameter} 向模型中添加额外的前馈层作为专家，并使用量子多体问题的矩阵乘积运算符分解专家的权重矩阵，以减少不同专家之间的信息冗余。
+AdaMix~\cite{wang2022adamix} 将添加的适配器作为专家并使用随机路由策略来提升适配器的容量，进而提升参数有效微调方法的性能。
+因此，本文考虑在为视觉问答任务微调视觉语言预训练模型时引入专家混合模型。
+

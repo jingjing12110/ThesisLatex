@@ -1,0 +1,124 @@
+\begin{table}[!t]
+\caption{在VQA P2数据集上的性能 (\%)比较
+}
+\label{tab:c4_vqa_p2}
+\setlength{\tabcolsep}{21.5mm}{
+\begin{tabularx}{\linewidth}{@{}lll@{}} 
+\toprule
+
+Method
+&VQA-Score (PER)
+&CS(2) 
+\\
+\midrule[1.pt]
+
+\multicolumn{3}{c}{\textit{Data Augmentation}}
+\\
+% \cmidrule(l){2-3}
+
+StackNMN~\citep{hu2018explainable} 
+&63.30 
+&{66.20} 
+\\
+\quad + Q3R~\citep{whitehead2020learning}  
+&66.90 \positive{\uparrow 3.30} 
+&72.20 \positive{\uparrow 6.00} 
+\\
+HybridNet~\citep{whitehead2020learning} 
+&63.30 
+&{66.60} 
+\\
+\quad + Q3R~\citep{whitehead2020learning} 
+&67.00 \positive{\uparrow 4.00}  
+&72.50 \positive{\uparrow 5.90}  
+\\
+XNM~\citep{shi2019xnm} 
+&64.70 
+&68.80
+\\
+\quad + Q3R~\citep{whitehead2020learning} 
+&68.10 \positive{\uparrow 3.40}  
+&74.40 \positive{\uparrow 5.60}  
+\\
+\midrule
+
+\multicolumn{3}{c}{\textit{w/o Data Augmentation}}
+\\
+
+VisualBERT~\citep{li2019visualbert}\textcolor{red}{$^\dagger$} 
+&68.23 &72.34
+\\
+\quad + Our CIB 
+&69.92 \positive{\uparrow 1.69} 
+&73.83 \positive{\uparrow 1.49}
+\\ 
+
+ViLBERT~\citep{lu2019vilbert}\textcolor{red}{$^\dagger$} 
+&67.18 &71.39
+\\
+\quad + Our CIB
+&69.92 \positive{\uparrow 2.74} 
+&73.98 \positive{\uparrow 2.59} 
+\\ 
+
+VL-BERT$_{\text{B}}$~\citep{su2019vl}\textcolor{red}{$^\dagger$} 
+&68.36 &72.52
+\\
+\quad + Our CIB
+&69.82 \positive{\uparrow 1.46} 
+&73.88 \positive{\uparrow 1.36} 
+\\ 
+
+VL-T5~\citep{cho2021unifying}\textcolor{red}{$^\dagger$}
+&71.63 &77.34
+\\
+\quad + Our CIB
+&73.47 \positive{\uparrow 1.84} 
+&78.99 \positive{\uparrow 1.65} 
+\\ 
+
+LXMERT~\citep{tan2019lxmert}\textcolor{red}{$^\dagger$}
+&77.30 &82.96
+\\
+\quad + Our CIB  
+&\textbf{78.93} \positive{\uparrow 1.63} 
+&\textbf{85.07} \positive{\uparrow 2.11}
+\\ 
+
+UNITER$_\text{B}$~\citep{chen2020uniter}\textcolor{red}{$^\dagger$}
+&70.36 &74.36 
+\\
+\quad + Our CIB  
+&71.30 \positive{\uparrow 0.94} 
+&75.91 \positive{\uparrow 1.55} 
+\\ 
+
+ALBEF~\citep{li2021align}\textcolor{red}{$^\dagger$}
+&71.36 &76.00
+\\
+\quad + Our CIB
+&72.84 \positive{\uparrow 1.48} 
+&77.46 \positive{\uparrow 1.46} 
+\\ 
+
+% {mPLUG$_{\text{B}}$} \cite{li2022mplug}\textcolor{red}{$^\dagger$}
+% &{71.95} 
+% &{76.75}
+% \\
+% \quad {+ CIB}
+% &{73.11 \positive{\uparrow 1.16}} 
+% &{78.09 \positive{\uparrow 1.34}} 
+% \\ 
+% {BEiT-3$_{\text{B}}$} \cite{wang2022image}\textcolor{red}{$^\dagger$}
+% &{73.65}
+% &{78.56}
+% \\
+% \quad {+ CIB}
+% &{75.22 \positive{\uparrow 1.57}} 
+% &{81.28 \positive{\uparrow 2.72}} 
+% \\ 
+
+\bottomrule
+\end{tabularx}
+}
+\end{table}

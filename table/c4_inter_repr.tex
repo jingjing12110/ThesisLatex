@@ -1,0 +1,39 @@
+\begin{table}[!t]
+\caption{双流视觉语言模型不同中间表征对CIB的影响}
+\label{tab:c4_lxmert_var}
+\setlength{\tabcolsep}{16.mm}{
+\begin{tabularx}{\linewidth}{@{}llc@{}}
+\toprule 
+VLMs
+&\multicolumn{1}{c}{$\mathcal{L}_{\text{CIB}}$}
+&VQA-Score (PER)
+\\ 
+
+\midrule[1pt]
+
+\multirow{3}{*}{\makecell[l]{LXMERT~\citep{tan2019lxmert}}}
+&$I(\Ymat; \Tmat)$
+&70.41 
+\\
+&$I(\Ymat; \Tmat) - \beta I(\Xmat^v, \Xmat^l; \Tmat^{'v}, \Tmat^{'l})$
+&72.53
+\\
+&$I(\Ymat; \Tmat) - \beta I(\Xmat^v, \Xmat^l; \Tmat^v, \Tmat^l)$ 
+&\textbf{72.62} 
+\\ 
+\midrule
+\multirow{3}{*}{\makecell[l]{ViLBERT~\cite{lu2019vilbert}}}
+&$I(\Ymat; \Tmat)$
+&59.16 
+\\
+&$I(\Ymat; \Tmat) - \beta I(\Xmat^v, \Xmat^l; \Tmat^{'v}, \Tmat^{'l})$
+&62.23
+\\
+&$I(\Ymat; \Tmat) - \beta I(\Xmat^v, \Xmat^l; \Tmat^v, \Tmat^l)$ 
+&\textbf{62.28} 
+\\ 
+
+\bottomrule
+\end{tabularx}
+}
+\end{table}

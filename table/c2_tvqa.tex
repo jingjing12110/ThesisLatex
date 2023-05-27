@@ -1,0 +1,33 @@
+\begin{table}[!t]
+\centering
+\caption{在TVQA数据集上的性能比较 
+% Timestamp提示方法是否利用数据集提供的时间戳。
+} 
+\label{tab:c2_tvqa} 
+\setlength{\tabcolsep}{23.95mm}{
+\begin{tabularx}{\textwidth}{@{}lcc}
+\toprule
+~Method &Timestamp &Accuracy (\%) 
+\\
+\midrule
+~Multi-Stream~\cite{lei2018tvqa} &\checkmark &68.85 
+\\
+~MSAN~\cite{kim2020modality} &\checkmark &71.62 
+\\
+\midrule
+
+~Multi-Stream~\cite{lei2018tvqa} &\xmark &65.85 
+\\
+~PAMN~\cite{kim2019progressive} &\xmark &66.38 
+\\
+~MSAN~\cite{kim2020modality} &\xmark &69.89 
+\\ 
+~STAGE~\cite{lei2020tvqa} &\xmark &70.50 
+\\
+% \rowcolor{gray!15} 
+~\textbf{LiVLR} &\xmark &\textbf{73.95} 
+\\
+\bottomrule
+\end{tabularx} 
+}
+\end{table}

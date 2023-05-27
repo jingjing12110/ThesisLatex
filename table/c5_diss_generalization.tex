@@ -1,0 +1,57 @@
+\begin{table}[!t]
+\centering 
+\caption{MixPHM在其它视觉语言预训练模型上泛化能力的评测结果
+}
+\label{tab:c5_generalization}
+\setlength{\tabcolsep}{5.2mm}{
+\begin{tabularx}{\linewidth}{@{}llccccc}
+\toprule
+
+\multirow{2}{*}{VLMs} 
+&\multirow{2}{*}{Method} 
+&\#Param 
+&\multicolumn{4}{c}{\#Sample}
+\\
+
+\cmidrule(lr){4-7}
+
+& &(M) 
+&$N_{\mathcal{D}}$=16 
+&$N_{\mathcal{D}}$=64 
+&$N_{\mathcal{D}}$=500 
+&$N_{\mathcal{D}}$=1000
+\\
+\midrule
+
+\multirow{2}{*}{X-VLM~\cite{zeng2022multi}}
+&Finetuning
+&294 &26.63 &30.45 &38.96 &43.92 
+\\
+
+&MixPHM
+&0.66 &\textbf{27.54} &\textbf{31.80} &\textbf{41.05} &\textbf{48.06} 
+\\
+
+\midrule
+
+\multirow{2}{*}{BLIP~\cite{li2022blip}}
+&Finetuning
+&385 &27.01 &30.05 &37.00 &42.22
+\\
+&MixPHM
+&0.87 &\textbf{29.17} &\textbf{32.09} &\textbf{41.80} &\textbf{46.78} 
+\\
+
+\midrule
+
+\multirow{2}{*}{OFA$_{\text{Base}}$~\cite{wang2022ofa}}
+&Finetuning
+&180 &27.48 &31.75 &42.99 &46.81
+\\
+&MixPHM
+&0.70 &\textbf{28.46} &\textbf{33.00} &\textbf{45.88} &\textbf{50.01} 
+\\
+\bottomrule
+\end{tabularx}
+}
+\end{table}

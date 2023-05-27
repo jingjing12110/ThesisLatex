@@ -1,0 +1,50 @@
+\begin{table}[!t]
+\caption{数据集的统计信息
+% 。LType和QType表示语言内容的类型和问题设置的类型，OE和MC分别表示开放式和多选式视频问答设置。
+}
+\label{tab:c2_data_statistics} 
+\setlength{\tabcolsep}{.89mm}{
+% \begin{tabularx}{\textwidth}{l|ccc|ccc|ccc|cc}
+\begin{tabularx}{\textwidth}{lccccccccccc}
+\toprule
+\multirow{2}{*}{Dataset} 
+&\multicolumn{3}{c}{\#Question} 
+&\multicolumn{3}{c}{\#Video Clip}  
+&\multicolumn{3}{c}{\#Sentence} 
+&\multirow{2}{*}{LType} 
+&\multirow{2}{*}{QType} 
+\\
+
+\cmidrule(lr){2-4} 
+\cmidrule(lr){5-7}
+\cmidrule(lr){8-10}
+~&\multicolumn{1}{c}{Train} 
+&\multicolumn{1}{c}{Val} 
+&\multicolumn{1}{c}{Test} 
+&\multicolumn{1}{c}{Train} 
+&\multicolumn{1}{c}{Val} 
+&\multicolumn{1}{c}{Test} 
+&\multicolumn{1}{c}{Train} 
+&\multicolumn{1}{c}{Val} 
+&\multicolumn{1}{c}{Test} 
+& & 
+\\
+\midrule
+
+MSRVTT-QA~\cite{xu2017video} &158,581 &12,278 &72,821 &6,513 &497 &2,990 &78,156 &5,964 &35,880 
+% &64 &\textbf{10} &12 
+&caption &OE 
+\\
+KnowIT-VQA~\cite{garcia2020knowit} &19,569 &2,352 &2,361 &9,731 &1,178 &1,178 &19,569 &2,352 &2,361 
+% &\textbf{32} &12 &\textbf{12/1} 
+&sub/know &MC 
+\\
+TVQA~\cite{lei2018tvqa} &122,039 &15,253 &7,623 &17,435 &2,179 &1,089 &17,435 &2,179 &1,089 
+% &\textbf{32} &12 &16 
+&sub &MC 
+\\ 
+\bottomrule
+\end{tabularx}
+}
+\end{table}
+
